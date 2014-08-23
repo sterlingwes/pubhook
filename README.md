@@ -18,11 +18,11 @@ Inspired by [Webhook](http://webhook.com), but hacker-friendly.
 
 Here we'll list progress towards 1.0.
 
-*0.1.0* Handles rendering from markdown files swig template extensions
+*0.1.0* Handles rendering from markdown files & swig template extensions
 
 ## Usage
 
-1.  Clone this repository `git clone https://github.com/sterlingwes/pubhook.git *myproject*`
+1.  Clone this repository `git clone https://github.com/sterlingwes/pubhook.git myproject`
 2.  `npm install`
 3.  `npm link` (if the ph command doesn't work)
 4.  run `ph` from within your project folder to render the site
