@@ -75,6 +75,7 @@ models.load(function(err,data) {
   gulp.task('copy', function() {
     console.log('- deploying changed src to '+paths.dest);
     return gulp.src(paths.build+'/*')
+      .pipe(plumr({ errorHandler: onError }))
       .pipe(gulp.dest(paths.dest));
   });
   tasks.push('copy');

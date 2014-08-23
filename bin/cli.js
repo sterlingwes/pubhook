@@ -5,7 +5,7 @@ var Cli = require('simpcli')
     start: {
       about: 'Build & render your site to the public folder',
       fn: function() {
-        require('./core/main.js');
+        require('../core/main.js');
       }
     },
     
@@ -19,7 +19,7 @@ var Cli = require('simpcli')
         if(flagIdx>=0)
           port = args[flagIdx+1] || port;
           
-        require('./core/static-server.js')(port);
+        require('../core/static-server.js')(port);
       }
     }
 

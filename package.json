@@ -26,11 +26,8 @@
     "type": "git",
     "url": "git://github.com/sterlingwes/pubhook.git"
   },
-  "scripts": {
-    "preinstall": "npm install ../Vagrant/simpcli"
-  },
   "bin": {
-    "ph": "cli.js"
+    "ph": "bin/cli.js"
   },
   "keywords": [],
   "author": "Wes Johnson",
