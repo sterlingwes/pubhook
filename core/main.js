@@ -1,5 +1,6 @@
 var models = require('./models')
 
+  , glob = require('glob')
   , gulp = require('gulp')
   , gutil = require('gulp-util')
   , streamdata = require('gulp-data')
@@ -12,7 +13,9 @@ var models = require('./models')
   
   , cwd = process.cwd()
   , paths = {
+    'base':   cwd + '/*/',
     'pages':  cwd + '/pages/**/*.html',
+    'assets': cwd + '/assets/**/*.{css,js,png,jpg,jpeg,gif}',
     'build':  cwd + '/.build',
     'dest':   cwd + '/public'
   }
@@ -36,55 +39,74 @@ var models = require('./models')
   }
 ;
 
-// load our data then run tasks
-models.load(function(err,data) {
+// determine our directory structure
+glob(paths.base, function(err, files) {
+  var folders = files.map(function(f) { return f.split('/').pop(); });
   
-  //console.log(JSON.stringify(data,null,' '));
-  var tasks = [];
-  
-  // render from /pages
-  gulp.task('renderPages', function() {
-    // get our sources
-    console.log('- renderPages ' + paths.pages + ' to ' + paths.build);
+  // load our data then run tasks
+  models.load(function(err,data) {
     
-    return gulp.src(paths.pages)
-      .pipe(plumr({ errorHandler: onError }))
-      .pipe(streamdata(models.data()))
-      .pipe(swig())
-      .pipe(gulp.dest(paths.build));
-  });
-  tasks.push('renderPages');
-  
-  if(data.markdown) {
-    tasks.push('renderMarkdown');
-    gulp.task('renderMarkdown', function() {
-      console.log('- renderMarkdown to ' + paths.build);
-      var modelData = models.data();
-      return stringSrc(data.markdown)
+    //console.log(JSON.stringify(data,null,' '));
+    var tasks = [];
+    
+    // render from /pages
+    if(folders.indexOf('pages')!==-1) {
+      tasks.push('renderPages');
+      gulp.task('renderPages', function() {
+        // get our sources
+        console.log('- renderPages ' + paths.pages + ' to ' + paths.build);
+        
+        return gulp.src(paths.pages)
+          .pipe(plumr({ errorHandler: onError }))
+          .pipe(streamdata(models.data()))
+          .pipe(swig())
+          .pipe(gulp.dest(paths.build));
+      });
+    }
+    
+    // render from /markdown if it exists
+    if(folders.indexOf('markdown')!==-1) {
+      tasks.push('renderMarkdown');
+      gulp.task('renderMarkdown', function() {
+        console.log('- renderMarkdown to ' + paths.build);
+        var modelData = models.data();
+        return stringSrc(data.markdown)
+          .pipe(plumr({ errorHandler: onError }))
+          .pipe(streamdata(modelData))
+          .pipe(swig())
+          .pipe(rename(function(path) {
+            path.dirname = path.dirname.replace(/markdown\/?/,'');
+          }))
+          .pipe(gulp.dest(paths.build));
+      });
+    }
+    
+    // pipe through our static assets
+    if(folders.indexOf('assets')!==-1) {
+      tasks.push('assets');
+      gulp.task('assets', function() {
+        console.log('- deploying assets to '+paths.dest);
+        return gulp.src(paths.assets)
+          .pipe(plumr({ errorHandler: onError }))
+          .pipe(gulp.dest(paths.build+'/assets'));
+      });
+    }
+    
+    // pipe through changed files from our build directory
+    gulp.task('copy', function() {
+      console.log('- deploying src to '+paths.dest);
+      return gulp.src(paths.build+'/*')
         .pipe(plumr({ errorHandler: onError }))
-        .pipe(streamdata(modelData))
-        .pipe(swig())
-        .pipe(rename(function(path) {
-          path.dirname = path.dirname.replace(/markdown\/?/,'');
-        }))
-        .pipe(gulp.dest(paths.build));
+        .pipe(gulp.dest(paths.dest));
     });
-  }
-  
-  // pipe through changed files from our build directory
-  gulp.task('copy', function() {
-    console.log('- deploying changed src to '+paths.dest);
-    return gulp.src(paths.build+'/*')
-      .pipe(plumr({ errorHandler: onError }))
-      .pipe(gulp.dest(paths.dest));
+    tasks.push('copy');
+    
+    // in lieu of calling gulp from the command line...
+    gulp.start(tasks, function(err) {
+      console.log('- done tasks', err ? (err.stack || err) : '');
+      //console.log('- cleaning up');
+      //del(paths.build, function() {});
+    });
+    
   });
-  tasks.push('copy');
-  
-  // in lieu of calling gulp from the command line...
-  gulp.start(tasks, function(err) {
-    console.log('- done tasks', err ? (err.stack || err) : '');
-    console.log('- cleaning up');
-    del(paths.build, function() {});
-  });
-  
 });
