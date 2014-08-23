@@ -1,0 +1,42 @@
+{
+  "name": "pubhook",
+  "version": "0.1.0",
+  "description": "",
+  "main": "start.js",
+  "dependencies": {
+    "glob": "",
+    "swig": "",
+    "gulp": "~3.8.7",
+    "gulp-data": "~1.0.2",
+    "gulp-swig": "~0.7.2",
+    "lodash": "~2.4.1",
+    "gulp-plumber": "~0.6.4",
+    "gulp-rename": "~1.2.0",
+    "es6-promise": "~1.0.0",
+    "front-matter": "~0.2.0",
+    "marked": "~0.3.2",
+    "gulp-util": "~3.0.0",
+    "serve-static": "~1.5.3",
+    "connect": "~2.25.7",
+    "gulp-changed": "~1.0.0",
+    "rimraf": "~2.2.8",
+    "simpcli": ""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/sterlingwes/pubhook.git"
+  },
+  "scripts": {
+    "preinstall": "npm install ../Vagrant/simpcli"
+  },
+  "bin": {
+    "ph": "cli.js"
+  },
+  "keywords": [],
+  "author": "Wes Johnson",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/sterlingwes/pubhook/issues"
+  },
+  "homepage": "https://github.com/sterlingwes/pubhook"
+}
