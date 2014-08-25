@@ -18,8 +18,8 @@ Inspired by [Webhook](http://webhook.com), but hacker-friendly.
 
 Here we'll list progress towards 1.0.
 
-*0.1.0* Handles rendering from markdown files & swig template extensions
-*0.2.0* Handles bundling client side modules with webpack
+*   _0.1.0_ Handles rendering from markdown files & swig template extensions
+*   _0.2.0_ Handles bundling client side modules with webpack
 
 ## Usage
 
