@@ -6,21 +6,17 @@ var Cli = require('simpcli')
       about: 'Build & render your site to the public folder',
       fn: function() {
         console.log('- Starting build...');
-        require('../core/main.js');
+        require('../core/main.js')( this.parseFlags(arguments) );
       }
     },
     
     serve: {
       about: 'Start a simple static HTTP file server for development, -p port',
       fn: function() {
-        var args = [].slice.call(arguments,0)
-          , port = 8181
-          , flagIdx = args.indexOf('-p');
-        
-        if(flagIdx>=0)
-          port = args[flagIdx+1] || port;
+        var args = this.parseFlags(arguments)
+          , port = 8181;
           
-        require('../core/static-server.js')(port);
+        require('../core/static-server.js')(args.p || port);
       }
     }
 

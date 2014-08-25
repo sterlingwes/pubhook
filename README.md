@@ -1,6 +1,8 @@
 # pubhook
 
-Inspired by [Webhook](http://webhook.com), but hacker-friendly.
+Flexible framework for deploying anything from static sites to single page applications.
+
+Inspired by [Webhook](http://webhook.com).
 
 **Note** The API and CLI usage will significantly change after the first 4 goals are achieved, below. The project in its current form is a boilerplate, not an installable module.
 
@@ -20,6 +22,7 @@ Here we'll list progress towards 1.0.
 
 *   _0.1.0_ Handles rendering from markdown files & swig template extensions
 *   _0.2.0_ Handles bundling client side modules with webpack
+*   _0.3.0_ Handles watch > liveReload for less
 
 ## Usage
 
@@ -50,7 +53,7 @@ Markdown files in this directory will be rendered using the `base.html` template
 
 ### Models
 
-Models are where you will define your model schema and validation and form the basis for how rendering is driven from database sources and standard restful endpoints are built for client usage.
+Models are where you will define your model schema and validation rules and form the basis for how rendering is driven from database sources and standard restful endpoints are built for client usage.
 
 You can also define "static" models that are essentially json objects made available to your templates.
 
@@ -68,7 +71,7 @@ At the moment pubhook's templating engine is [swig](paularmstrong.github.io/swig
 
 Retrieves model data.
 
-`{% set site = get('site') %}
+`{% set site = get('site') %}`
 
 ##### getAppScript(appName)
 
