@@ -19,12 +19,71 @@ Inspired by [Webhook](http://webhook.com), but hacker-friendly.
 Here we'll list progress towards 1.0.
 
 *0.1.0* Handles rendering from markdown files & swig template extensions
+*0.2.0* Handles bundling client side modules with webpack
 
 ## Usage
 
 1.  Clone this repository `git clone https://github.com/sterlingwes/pubhook.git myproject`
 2.  `npm install`
 3.  `npm link` (if the ph command doesn't work)
-4.  run `ph` from within your project folder to render the site
+4.  run `ph` from within your project folder to render the site (known herein as "render time")
 
 `ph help` to see list of available commands.
+
+## Components
+
+The functionality of pubhook mostly maps to the folder structure outlined below. The `bin` and `core` directories are specific to pubhook and will be part of the separate pubhook module in the near future.
+
+### Apps
+
+Apps are where you break your client side js into modules that are bundled by webpack into one script at render time. Each folder within the apps directory is a separate webpack environment and will be bundled separately. [Read more about webpack](http://webpack.github.io)
+
+Each webpack bundle is output to the `public/scripts/` directory using its hash. See the template section below for more on adding the script tag.
+
+### Assets
+
+The assets folder holds any static assets you want copied to your build at render time. Currently, only `css`, `js`, `png`, `jpg/jpeg`, and `gif` files are copied.
+
+### Markdown
+
+Markdown files in this directory will be rendered using the `base.html` template, and data added to the markdown model using yml front matter. The naming is directly transferable to the public folder: `markdown/about.md` >> `public/about.html`.
+
+### Models
+
+Models are where you will define your model schema and validation and form the basis for how rendering is driven from database sources and standard restful endpoints are built for client usage.
+
+You can also define "static" models that are essentially json objects made available to your templates.
+
+### Pages
+
+Similar to the markdown folder, pages allow you to generate pages by extending your templates. The naming is directly transferable to the public folder: `pages/index.html` >> `public/index.html`.
+
+### Templates
+
+At the moment pubhook's templating engine is [swig](paularmstrong.github.io/swig/docs/). At a minimum you require a `partials/base.html` from which pages are rendered.
+
+#### Pubhook-specific template tags
+
+##### get(modelName)
+
+Retrieves model data.
+
+`{% set site = get('site') %}
+
+##### getAppScript(appName)
+
+Retrieves the script tag for the bundled file corresponding to the appName you pass in (which should match the subfolder of the `apps` directory).
+
+`{{ getAppScript('main') }}`
+
+results in:
+
+`<script src="/scripts/7e7fd8b1de54ec836b57.js"></script>`
+
+## Build Steps / Hooks / Plugins
+
+Coming soon.
+
+## License
+
+MIT
