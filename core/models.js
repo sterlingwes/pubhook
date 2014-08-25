@@ -2,6 +2,7 @@ var glob = require('glob')
   , Functions = require('./tplfuncs')
   , _ = require('lodash')
   , models = {}
+  , vars = {}
   , cwd = process.cwd()
   , modelPath = './models'
   , Promise = require('es6-promise').Promise
@@ -99,8 +100,17 @@ var getter = function(modelName) {
   return models[modelName];
 };
 
+var getVar = function(key) {
+  return vars[key];
+};
+
+var setVar = function(key,val) {
+  vars[key] = val;
+  return true;
+};
+
 var prepData = function() {
-  var fns = new Functions(models);
+  var fns = new Functions(models, vars);
   return _.extend({}, fns);
 };
 
@@ -109,6 +119,9 @@ module.exports = {
   load: loader,
   
   get:  getter,
+  
+  getVar: getVar,
+  setVar: setVar,
   
   data: prepData
   

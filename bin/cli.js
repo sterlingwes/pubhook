@@ -5,6 +5,7 @@ var Cli = require('simpcli')
     start: {
       about: 'Build & render your site to the public folder',
       fn: function() {
+        console.log('- Starting build...');
         require('../core/main.js');
       }
     },

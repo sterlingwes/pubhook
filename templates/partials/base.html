@@ -16,9 +16,19 @@
     <!--<link rel="shortcut icon" href="/static/images/favicon.png">
     <link rel="apple-touch-icon icon-precomposed" href="/static/images/apple-touch-icon.png"/>-->
     
-    <link rel="stylesheet" type="text/css" href="/assets/css/style.css" />
+    <link rel="stylesheet" type="text/css" href="/assets/css/normalize.css" />
 
     {% block head_extra %}{% endblock %}
+    
+    {% set analytics = getSetting('analytics_id')%}
+    {% if analytics %}
+      <script>
+        var _gaq=[['_setAccount','{{ analytics }}'],['_trackPageview']];
+        (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
+        g.src='//www.google-analytics.com/ga.js';
+        s.parentNode.insertBefore(g,s)}(document,'script'));
+      </script>
+    {% endif %}
   </head>
   <body>
 
@@ -35,15 +45,9 @@
 
       {% include "footer.html" %}
 
-      {% set analytics = getSetting('analytics_id')%}
-      {% if analytics %}
-        <script>
-          var _gaq=[['_setAccount','{{ analytics }}'],['_trackPageview']];
-          (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
-          g.src='//www.google-analytics.com/ga.js';
-          s.parentNode.insertBefore(g,s)}(document,'script'));
-        </script>
-      {% endif %}
     {% endblock %}
+    
+    {{ getAppScript('main') }}
+    {% block foot_extra %}{% endblock %}
   </body>
 </html>
