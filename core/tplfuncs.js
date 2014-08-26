@@ -2,6 +2,8 @@ module.exports = function(data, vars) {
  
  return {
    get: function(name) {
+     var d = data[name];
+     if(d && d.items) return d.items; // if it's a database resource, don't pass the model schema
      return data[name];
    },
    

@@ -1,4 +1,3 @@
-
 var gulp = require('gulp')
   , sequence = require('run-sequence')
   , gutil = require('gulp-util')
@@ -56,6 +55,9 @@ module.exports = function(folders, models, data/* models */, isWatching) {
     , hasPages = folders.indexOf('pages')!==-1
     , hasMd = folders.indexOf('markdown')!==-1
     , hasAssets = folders.indexOf('assets')!==-1
+    , isRenderable = _.filter(data, function(d) {
+        return d && d.renderEachBy;
+      })
     ;
   
   // clean build directory
@@ -121,6 +123,11 @@ module.exports = function(folders, models, data/* models */, isWatching) {
         }))
         .pipe(gulp.dest(paths.build));
     });
+  }
+  
+  // render any database items
+  if(isRenderable) {
+    // TODO: handle rendering db items here using title & body which can also be transform functions from model schema
   }
   
   // pipe through our static assets
@@ -194,6 +201,7 @@ module.exports = function(folders, models, data/* models */, isWatching) {
     if(!runCount) {
       console.log('- done tasks', err ? (err.stack || err) : '');
       if(isWatching) console.log('  ... and watching for changes');
+      else models.closeDbs();
     }
     runCount++;
   });

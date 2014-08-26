@@ -26,5 +26,5 @@ cli.chain.then(function(res) {
   // do something when done?
 })
 .catch(function(err) {
-  cli.print('Oops!', err);
+  cli.print('Oops!', err && err.stack ? err.stack : err);
 });

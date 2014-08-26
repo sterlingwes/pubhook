@@ -21,8 +21,9 @@ Inspired by [Webhook](http://webhook.com).
 Here we'll list progress towards 1.0.
 
 *   _0.1.0_ Handles rendering from markdown files & swig template extensions
-*   _0.2.0_ Handles bundling client side modules with webpack
-*   _0.3.0_ Handles watch > liveReload for less
+*   _0.1.5_ Handles bundling client side modules with webpack
+*   _0.1.7_ Handles watch > liveReload for less
+*   _0.2.0_ MongoDB adaptor
 
 ## Usage
 
