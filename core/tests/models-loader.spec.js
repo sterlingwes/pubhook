@@ -10,7 +10,28 @@ describe('model loader', function() {
     
     loader(function(err,data) {
       expect(err).toBeNull();
-      expect(data).toEqual({ './tests/site': { name: 'My Site' }});
+      expect(data).toEqual({ './tests/db-mongo.site': { name: 'My Site' }});
+    });
+    
+  });
+  
+  it('should load a markdown model', function() {
+    
+    var loader = require('../models-loader')({}, {
+      glob: function(glob, cb) {
+        if(glob=='./models/*.js')
+          cb(null, ['./tests/markdown.js']);
+        else
+          cb(null, ['./tests/markdown.md']);
+      }
+    });
+    
+    loader(function(err,data) {
+      var mds = data['./tests/markdown']
+        , keys = Object.keys(mds);
+      
+      expect(keys.length).toEqual(1);
+      expect(typeof mds[keys[1]] === 'object').toEqual(true);
     });
     
   });

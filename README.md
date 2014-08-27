@@ -24,13 +24,14 @@ Here we'll list progress towards 1.0.
 *   _0.1.5_ Handles bundling client side modules with webpack
 *   _0.1.7_ Handles watch > liveReload for less
 *   _0.2.0_ MongoDB adaptor
+*   _0.2.5_ Render from database adaptors
 
 ## Usage
 
 1.  Clone this repository `git clone https://github.com/sterlingwes/pubhook.git myproject`
 2.  `npm install`
 3.  `npm link` (if the ph command doesn't work)
-4.  run `ph` from within your project folder to render the site (known herein as "render time")
+4.  run `ph` from within your project folder to render the site (with `-w` to build changes)
 
 `ph help` to see list of available commands.
 

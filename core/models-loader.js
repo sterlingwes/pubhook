@@ -2,6 +2,7 @@ module.exports = function(models, test) {
   
   var glob = test ? test.glob : require('glob')
     , Promise = require('es6-promise').Promise
+    , slug = require('./model-parse-data')
     , cwd = process.cwd()
     , modelPath = './models'
     , readMdFiles = require('./models-md')
@@ -30,7 +31,12 @@ module.exports = function(models, test) {
         glob(source + '/*.md', function(err,files) {
           readMdFiles(files.map(function(f) { return f.replace(/^\.+/,cwd); }), function(err,res) {
             if(err) return console.warn(err);
-            done(err, _.groupBy(res,'name'));
+            var groupedByFile = _.groupBy(res,'name');
+            _.each(groupedByFile, function(files,k) {
+              if(files.length==1)
+                groupedByFile[k] = files[0];
+            });
+            done(err, groupedByFile);
           });
         });
         break;
@@ -46,7 +52,7 @@ module.exports = function(models, test) {
             
             return cursor.toArray(function(err,res) {
               if(err) return done(err);
-              done(null, _.extend(m, { items: res }));
+              done(null, _.extend(m, { items: _.map(res, function(r) { r.__uri = slug(m.renderEachBy, r); return r; }) }));
             });
             
           }).catch(function(err) { done(err); });
@@ -76,7 +82,7 @@ module.exports = function(models, test) {
               try {
                 fetchModel(modelName, require(f.replace(/^\.+/, cwd)), function(err,m) {
                   if(err) return console.warn(err);
-                  if(m)   models[modelName] = m;
+                  if(m) { models[modelName] = m; }
                   res(models[modelName]);
                 });
 

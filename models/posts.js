@@ -4,6 +4,6 @@ module.exports = {
   
   collection: 'posts',
   
-  renderEachBy: '{title}'
+  renderEachBy: 'posts/are/great/{title}'
   
 };

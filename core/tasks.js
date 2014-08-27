@@ -13,6 +13,8 @@ var gulp = require('gulp')
   , _ = require('lodash')
   , del = require('rimraf')
 
+  , cwd = process.cwd()
+
   , onError = function(err) {
       console.warn(err.stack);
   }
@@ -23,25 +25,32 @@ var gulp = require('gulp')
   , stringSrc = function(files) {
       var src = stream.Readable({ objectMode: true });
       src._read = function() {
-        _.each(files, function(f) {
-          f = f[0];
-          this.push(new gutil.File({ cwd:"", base:"", path: f.name, contents: new Buffer( swigWrap(f.body) ) }));
+        _.each(files, function(f,i) {
+          if(!f) return;
+          var body = typeof f.body === 'function' ? f.body() : f.body
+          
+          // add cwd so swigWrap template extends correct base (needs to be two deeper than root)
+          // hackish: uses tilde to force only two directories after root, and renames within gulp stream
+            , uri = f.__uri ? cwd + '/.dbrender/' + f.__uri.replace(/\//g,'~') : (f.name || 'item-' + i);
+          
+          this.push(new gutil.File({ cwd:"", base:"", path: uri, contents: new Buffer( swigWrap(body) ) }));
           this.push(null);
         }.bind(this));
       };
       return src;
   }
-  , cwd = process.cwd()
+  
   , paths = {
-    'base':   cwd + '/*/',
-    'pages':  cwd + '/pages/**/*.html',
-    'assetRoot': cwd + '/assets',
-    'assets': cwd + '/assets/**/*.{css,js,png,jpg,jpeg,gif}',
-    'less':   cwd + '/assets/**/*.less',
-    'apps':   cwd + '/apps',
-    'build':  cwd + '/.build',
-    'buildApps': cwd + '/.build/scripts',
-    'dest':   cwd + '/public'
+    'base':       cwd + '/*/',
+    'pages':      cwd + '/pages/**/*.html',
+    'assetRoot':  cwd + '/assets',
+    'assets':     cwd + '/assets/**/*.{css,js,png,jpg,jpeg,gif}',
+    'less':       cwd + '/assets/**/*.less',
+    'apps':       cwd + '/apps',
+    'templates':  cwd + '/templates/**/*.html',
+    'build':      cwd + '/.build',
+    'buildApps':  cwd + '/.build/scripts',
+    'dest':       cwd + '/public'
   }
 ;
 
@@ -56,7 +65,8 @@ module.exports = function(folders, models, data/* models */, isWatching) {
     , hasMd = folders.indexOf('markdown')!==-1
     , hasAssets = folders.indexOf('assets')!==-1
     , isRenderable = _.filter(data, function(d) {
-        return d && d.renderEachBy;
+        // we only want those with specified uri schemes that aren't markdown (done by directory structure) or static models
+        return d && d.renderEachBy && (!d.pubhookType || d.pubhookType != 'markdown');
       })
     ;
   
@@ -99,7 +109,7 @@ module.exports = function(folders, models, data/* models */, isWatching) {
   if(hasPages) {
     gulp.task('renderPages', function() {
       // get our sources
-      console.log('- renderPages ' + paths.pages + ' to ' + paths.build);
+      console.log('- renderPages');
       
       return gulp.src(paths.pages)
         .pipe(plumr({ errorHandler: onError }))
@@ -112,7 +122,7 @@ module.exports = function(folders, models, data/* models */, isWatching) {
   // render from /markdown if it exists
   if(hasMd) {
     gulp.task('renderMarkdown', function() {
-      console.log('- renderMarkdown to ' + paths.build);
+      console.log('- renderMarkdown');
       var modelData = models.data();
       return stringSrc(data.markdown)
         .pipe(plumr({ errorHandler: onError }))
@@ -127,13 +137,26 @@ module.exports = function(folders, models, data/* models */, isWatching) {
   
   // render any database items
   if(isRenderable) {
-    // TODO: handle rendering db items here using title & body which can also be transform functions from model schema
+    gulp.task('renderRenderable', function() {
+      console.log('- renderRenderable');
+      var modelData = models.data();
+      return stringSrc(_.flatten(_.pluck(isRenderable,'items')))
+        .pipe(plumr({ errorHandler: onError }))
+        .pipe(streamdata(modelData))
+        .pipe(swig())
+        .pipe(rename(function(path) {
+          var base = path.basename.split('~');
+          path.basename = base.pop();
+          path.dirname = base.join('/');
+        }))
+        .pipe(gulp.dest(paths.build));
+    });
   }
   
   // pipe through our static assets
   if(hasAssets) {
     gulp.task('copyAssets', function() {
-      console.log('- deploying assets to '+paths.dest);
+      console.log('- deploying assets');
       return gulp.src(paths.assets)
         .pipe(plumr({ errorHandler: onError }))
         .pipe(changed(paths.dest+'/assets'))
@@ -154,6 +177,7 @@ module.exports = function(folders, models, data/* models */, isWatching) {
     gulp.task('watch', function() {
       livereload.listen(35729);
       gulp.watch(paths.less, ['watch-less']);
+      gulp.watch(paths.templates, ['watch-templates']);
       gulp.watch(paths.dest + '/**/*').on('change', livereload.changed);
     });
   }
@@ -177,6 +201,7 @@ module.exports = function(folders, models, data/* models */, isWatching) {
     if(hasApps) preRender.push('webpack');
     if(hasPages) render.push('renderPages');
     if(hasMd) render.push('renderMarkdown');
+    if(isRenderable) render.push('renderRenderable');
     
     order.push(preRender);
     if(render.length) order.push(render);
@@ -194,6 +219,13 @@ module.exports = function(folders, models, data/* models */, isWatching) {
    */
   gulp.task('watch-less', function(cb) {
     sequence('less', 'copyAssets', cb);
+  });
+  
+  /*
+   * watch-templates task
+   */
+  gulp.task('watch-templates', function(cb) {
+    sequence(['renderPages', 'renderMarkdown', 'renderRenderable'], 'publishDest', cb);
   });
   
   // in lieu of calling gulp from the command line...

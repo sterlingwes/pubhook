@@ -5,6 +5,17 @@ var Promise = require('es6-promise').Promise
 ;
 
 // TODO: abstract this so other file formats can be handled
+
+/*
+ * readMdFiles
+ * 
+ * @param {Array} files paths to markdown files
+ * @param {Function} done callback
+ * @return {Array} of processed markdown files with the following keys:
+ *    - attributes (object) from yml front-matter
+ *    - name (string) full path to source md file
+ *    - body (string) rendered html
+ */
 var readMdFiles = function(files, done) {
   
   var promises = files.map(function(f) {
