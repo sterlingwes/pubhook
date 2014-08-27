@@ -23,8 +23,12 @@ var Cli = require('simpcli')
     clean: {
       about: 'Empties the public folder',
       fn: function() {
-        require('rimraf')(process.cwd()+'/public/**/*');
-        console.log('cleaned.');
+        var dir = process.cwd()+'/public/**/*';
+        console.log('Cleaning ' + dir + '...');
+        require('del')(dir, function(err) {
+          if(err) return console.error(err);
+          console.log('public directory cleaned.');
+        });
       }
     }
 
