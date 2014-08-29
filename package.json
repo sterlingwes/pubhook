@@ -1,6 +1,6 @@
 {
   "name": "pubhook",
-  "version": "0.2.6",
+  "version": "0.2.7",
   "description": "",
   "main": "start.js",
   "dependencies": {
@@ -27,7 +27,8 @@
     "gulp-livereload": "~2.1.1",
     "run-sequence": "~0.3.6",
     "mongodb": "~1.4.8",
-    "uslug": "~1.0.3"
+    "uslug": "~1.0.3",
+    "script-loader": "~0.6.0"
   },
   "repository": {
     "type": "git",

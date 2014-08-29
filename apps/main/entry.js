@@ -1,3 +1,7 @@
-var _ = require('lodash');
+require('script!zepto/zepto');
 
-_.times(4, function(i) { console.log(i); });
+$(document).ready(function() {
+  $('#menuLink').on('click', function() {
+    $('#layout, #menuLink, #menu').toggleClass('active');
+  });
+});

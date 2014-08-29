@@ -1,7 +1,10 @@
 {% set curUrl = getCurrentUrl() %}
 {% set check_for_blog = get('blog') %}
 
-<nav>
+<a href="#menu" id="menuLink" class="menu-link">
+  <span></span>
+</a>
+<div id="menu">
   <div class="container">
     <span class="mobile-menu-btn fa fa-bars"> Menu</span>
     <ul>
@@ -10,4 +13,4 @@
       <li><a href="cat/nested.html">A nested page</a></li>
     </ul>
   </div>
-</nav>
+</div>
