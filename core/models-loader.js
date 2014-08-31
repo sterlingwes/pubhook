@@ -31,7 +31,13 @@ module.exports = function(models, test) {
         glob(source + '/*.md', function(err,files) {
           readMdFiles(files.map(function(f) { return f.replace(/^\.+/,cwd); }), function(err,res) {
             if(err) return console.warn(err);
-            var groupedByFile = _.groupBy(res,'name');
+            var groupedByFile = _.groupBy(_.map(res, function(r) {
+              if(r.attributes) {
+                r.__uri = r.attributes.uri || r.name;
+                r.__name = name;
+              }
+              return r;
+            }),'name');
             _.each(groupedByFile, function(files,k) {
               if(files.length==1)
                 groupedByFile[k] = files[0];
@@ -52,7 +58,11 @@ module.exports = function(models, test) {
             
             return cursor.toArray(function(err,res) {
               if(err) return done(err);
-              done(null, _.extend(m, { items: _.map(res, function(r) { r.__uri = slug(m.renderEachBy, r); return r; }) }));
+              done(null, _.extend(m, { items: _.map(res, function(r) {
+                r.__uri = slug(m.renderEachBy, r);
+                r.__name = name;
+                return r; 
+              }) }));
             });
             
           }).catch(function(err) { done(err); });

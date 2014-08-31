@@ -1,16 +1,22 @@
+var cwd = process.cwd();
+
+if(!/tests$/.test(cwd)) cwd += '/tests';
+
 describe('model loader', function() {
   
   it('should load a static model', function() {
 
     var loader = require('../models-loader')({}, {
       glob: function(glob, cb) {
-        cb(null, ['./tests/db-mongo.site.js']);
+        cb(null, [cwd+'/models/db-mongo.site.js']);
       }
     });
     
     loader(function(err,data) {
       expect(err).toBeNull();
-      expect(data).toEqual({ './tests/db-mongo.site': { name: 'My Site' }});
+      var t = {};
+      t[cwd+'/models/db-mongo.site'] = { name: 'My Site' };
+      expect(data).toEqual(t);
     });
     
   });
@@ -20,14 +26,14 @@ describe('model loader', function() {
     var loader = require('../models-loader')({}, {
       glob: function(glob, cb) {
         if(glob=='./models/*.js')
-          cb(null, ['./tests/markdown.js']);
+          cb(null, [cwd+'/models/markdown.js']);
         else
-          cb(null, ['./tests/markdown.md']);
+          cb(null, [cwd+'/markdown/markdown.md']);
       }
     });
     
     loader(function(err,data) {
-      var mds = data['./tests/markdown']
+      var mds = data[cwd+'/models/markdown']
         , keys = Object.keys(mds);
       
       expect(keys.length).toEqual(1);
@@ -40,14 +46,16 @@ describe('model loader', function() {
 
     var loader = require('../models-loader')({}, {
       glob: function(glob, cb) {
-        cb(null, ['./tests/db-mongo.mongo.js']);
+        cb(null, [cwd+'/models/db-mongo.mongo.js']);
       }
     });
     
     loader(function(err,data) {
       expect(err).toBeNull();
-      expect(data).toEqual({ './tests/mongo': [] });
-      expect(data['./tests/db-mongo.mongo'].length).toEqual(0);
+      var t = {};
+      t[cwd+'/models/mongo'] = [];
+      expect(data).toEqual(t);
+      expect(data[cwd+'/models/db-mongo.mongo'].length).toEqual(0);
       
       require('../db-mongo')({}).then(function(conn) {
         conn.close();

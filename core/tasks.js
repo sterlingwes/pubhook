@@ -1,4 +1,5 @@
 var gulp = require('gulp')
+  , fs = require('fs')
   , sequence = require('run-sequence')
   , gutil = require('gulp-util')
   , streamdata = require('gulp-data')
@@ -12,6 +13,7 @@ var gulp = require('gulp')
   , less = require('gulp-less')
   , _ = require('lodash')
   , del = require('rimraf')
+  , sitemap = require('./models-sitemap')
 
   , cwd = process.cwd()
 
@@ -31,7 +33,14 @@ var gulp = require('gulp')
           
           // add cwd so swigWrap template extends correct base (needs to be two deeper than root)
           // hackish: uses tilde to force only two directories after root, and renames within gulp stream
-            , uri = f.__uri ? cwd + '/.dbrender/' + f.__uri.replace(/\//g,'~') : (f.name || 'item-' + i);
+            , uri = f.__uri && /\.md$/.test(f.__uri)===false ? cwd + '/.dbrender/' + f.__uri.replace(/\//g,'~') : (f.name || 'item-' + i);
+          
+          // add to our sitemapping
+          sitemap.set(f.__uri || uri, {
+            name: f.__name,
+            id: f._id,
+            index: i
+          });
           
           this.push(new gutil.File({ cwd:"", base:"", path: uri, contents: new Buffer( swigWrap(body) ) }));
           this.push(null);
@@ -238,6 +247,10 @@ module.exports = function(folders, models, data/* models */, isWatching) {
       console.log('- done tasks', err ? (err.stack || err) : '');
       if(isWatching) console.log('  ... and watching for changes');
       else models.closeDbs();
+      var smap = JSON.stringify(sitemap.get(), null, ' ');
+      fs.writeFile(cwd + '/sitemapping.json', smap, function(err) {
+        if(err) console.warn('! Error writing sitemap: ', err);
+      });
     }
     runCount++;
   });

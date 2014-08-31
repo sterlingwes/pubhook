@@ -1,4 +1,5 @@
-var Functions = require('./tplfuncs')
+var sitemap = require('./models-sitemap')
+  , Functions = require('./tplfuncs')(sitemap)
   , _ = require('lodash')
   , models = {}
   , vars = {}
@@ -65,5 +66,10 @@ module.exports = {
   /*
    * closeDbs - closes all open database connections
    */
-  closeDbs: closeDbs
+  closeDbs: closeDbs,
+  
+  /*
+   * sitemap - shared reference
+   */
+  sitemap: sitemap
 };
