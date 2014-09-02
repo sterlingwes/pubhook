@@ -58,16 +58,21 @@ module.exports = {
     return adapter(config).then(function(conn) {
       
       var cli = conn.cli
-        , db = cli.db(m.dbName || 'pubhook');
+        , db = cli.db(m.dbName || 'pubhook')
+        , collection = db.collection(m.collection);
       
       return {
         
         index: function(done,req) {
-          var cursor = db.collection(m.collection).find({});
+          var cursor = collection.find({});
           return cursor.toArray(function(err,res) {
             if(err) return done(err);
             done(null, res);
           });
+        },
+        
+        create: function(data,done) {
+          collection.insert(data, done);
         }
         
       };

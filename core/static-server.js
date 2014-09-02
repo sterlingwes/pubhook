@@ -1,16 +1,21 @@
 var connect = require('connect')
-  , apiMiddleware = require('./api-server')
-  , staticMiddleware = require('serve-static');
+  , tools = require('./server-tools')
+  , apiMiddleware = require('./api-server').middleware()
+  , staticMiddleware = require('serve-static')
+  , _ = require('lodash');
   
 module.exports = function(port) {
   var server = connect();
   
+  // add an api render handler to response object
+  server.use('/api', tools.jsonHandler);
+  
   // handle api requests
-  connect.use('/api', apiMiddleware);
+  server.use('/api', apiMiddleware);
   
   // serve static assets
   // TODO: handle serving multisite setups
-  connect.use(staticMiddleware(process.cwd() + '/public', {
+  server.use(staticMiddleware(process.cwd() + '/public', {
     extensions: ['html']
   }))
   .listen(port);
