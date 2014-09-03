@@ -97,6 +97,31 @@ module.exports = {
     };
   },
   
+  getEndpoints: function(done, models) {
+    if(!models)
+      models = getModels();
+    
+    var resources = {};
+    _.each(models, function(m,k) {
+      var name = k.split('.').pop()
+        , actions = resources[name] = [];
+      
+      if(m && typeof m.resourceHandlers === 'object')
+        [].push.apply(actions, Object.keys(m.resourceHandlers));
+      else {
+        var db;
+        try { db = require('./db-'+resource.pubhookType); }
+        catch(e) {}
+        if(db)
+          db.resourceHandlers(resource).then(function(actions) {
+            [].push.apply(actions, Object.keys(actions));
+          });
+      }
+    });
+    
+    done(resources);
+  },
+  
   getPath: getPath,
   
   getModels: getModels

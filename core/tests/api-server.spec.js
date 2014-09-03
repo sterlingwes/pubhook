@@ -15,6 +15,15 @@ describe('api-server', function() {
     
   });
   
+  it('should know endpoints', function(done) {
+    
+    var endpoints = api.getEndpoints(function(eps) {
+      console.log(eps);
+      done();
+    });
+    
+  });
+  
   it('should parse request url', function() {
     
     var path = api.getPath({ url: '/pages' });

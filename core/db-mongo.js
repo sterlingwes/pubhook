@@ -63,7 +63,7 @@ module.exports = {
       
       return {
         
-        index: function(done,req) {
+        index: function(done) {
           var cursor = collection.find({});
           return cursor.toArray(function(err,res) {
             if(err) return done(err);
@@ -73,6 +73,14 @@ module.exports = {
         
         create: function(data,done) {
           collection.insert(data, done);
+        },
+        
+        update: function(id, data, done) {
+          
+        },
+        
+        delete: function(id, done) {
+        
         }
         
       };
