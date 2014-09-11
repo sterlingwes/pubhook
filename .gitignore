@@ -1,6 +1,9 @@
 # Zed editor config
 .zedstate
 
+# Don't include our sitemap tracking
+sitemapping.json
+
 # Encourage npm install / bower install for inclusion
 node_modules/
 bower_components/
