@@ -81,9 +81,12 @@ module.exports = function(folders, models, data/* models */, isWatching) {
     , hasAssets = folders.indexOf('assets')!==-1
     , isRenderable = _.filter(data, function(d) {
         // we only want those with specified uri schemes that aren't markdown (done by directory structure) or static models
-        return d && d.renderEachBy && (!d.pubhookType || d.pubhookType != 'markdown');
+        return d && d.renderEachBy && (!d.pubhookType || d.pubhookType != 'markdown') && (d.items && d.items.length);
       })
     ;
+  
+  if(!isRenderable.length)
+    isRenderable = false
   
   // clean build directory
   gulp.task('clean', function() {
