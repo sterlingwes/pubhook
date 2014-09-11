@@ -1,5 +1,13 @@
+# Zed editor config
 .zedstate
+
+# Encourage npm install / bower install for inclusion
 node_modules/
 bower_components/
+
+# No build or dist files
 public/
 .build/
+
+# Don't include our built css (assuming we're not writing css files directly)
+assets/**/*.css
