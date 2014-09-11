@@ -25,6 +25,7 @@ Here we'll list progress towards 1.0.
 *   _0.1.7_ Handles watch > liveReload for less
 *   _0.2.0_ MongoDB adaptor
 *   _0.2.5_ Render from database adaptors
+*   _0.2.9_ Support for SASS and Web Starter Kit as base styling
 
 ## Usage
 
@@ -88,6 +89,12 @@ results in:
 ## Build Steps / Hooks / Plugins
 
 Coming soon.
+
+## Base Styling
+
+Currently utilizes [Web Starter Kit](http://developers.google.com/web/starter-kit) as a style foundation, with plans to borrow some elements from that build process. The `styleguide.html` inside `/assets` is a good starting point for seeing and tailoring base styles. The modular nature of the SASS file structure makes it easy to cut out the styling you don't need and change / override others.
+
+The plan is to allow for easy drop-in / cloning of existing boilerplate solutions, other than WSK, into pubhook projects in the future. For the most part, the only changes required are fixing path references where builds vary.
 
 ## License
 

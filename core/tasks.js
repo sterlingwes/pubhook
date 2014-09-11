@@ -11,6 +11,7 @@ var gulp = require('gulp')
   , changed = require('gulp-changed')
   , livereload = require('gulp-livereload')
   , less = require('gulp-less')
+  , sass = require('gulp-sass')
   , _ = require('lodash')
   , del = require('rimraf')
   , sitemap = require('./models-sitemap')
@@ -48,13 +49,18 @@ var gulp = require('gulp')
       };
       return src;
   }
+
+  , typeWhitelist = [
+    'css','js','png','jpg','jpeg','gif','webapp','txt','ico','html','woff2','woff','ttf','svg','eot'
+  ]
   
   , paths = {
     'base':       cwd + '/*/',
     'pages':      cwd + '/pages/**/*.html',
     'assetRoot':  cwd + '/assets',
-    'assets':     cwd + '/assets/**/*.{css,js,png,jpg,jpeg,gif}',
+    'assets':     cwd + '/assets/**/*.{'+typeWhitelist.join(',')+'}',
     'less':       cwd + '/assets/**/*.less',
+    'sass':       cwd + '/assets/**/*.scss',
     'apps':       cwd + '/apps',
     'templates':  cwd + '/templates/**/*.html',
     'build':      cwd + '/.build',
@@ -115,6 +121,14 @@ module.exports = function(folders, models, data/* models */, isWatching) {
     console.log('- compiling less');
     return gulp.src(paths.less)
       .pipe(less())
+      .pipe(gulp.dest(paths.assetRoot));
+  });
+  
+  // compile any sass files
+  gulp.task('sass', function() {
+    console.log('- compiling sass');
+    return gulp.src(paths.sass)
+      .pipe(sass())
       .pipe(gulp.dest(paths.assetRoot));
   });
   
@@ -207,7 +221,7 @@ module.exports = function(folders, models, data/* models */, isWatching) {
    */
   gulp.task('build', function(cb) {
     var order = []
-      , preRender = ['clean','less']
+      , preRender = ['clean','less','sass']
       , render = []
       , pipe = ['publishDest'];
     

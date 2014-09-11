@@ -25,7 +25,7 @@ var prepData = function() {
 };
 
 var closeDbs = function() {
-  if(vars.mongo)  require('./db-mongo')().then(function(conn) { conn.close(); });
+  if(vars.mongo)  require('./db-mongo').adapter().then(function(conn) { conn.close(); });
 };
 
 module.exports = {

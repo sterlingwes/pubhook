@@ -1,57 +1,81 @@
-<!DOCTYPE html>
-<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
-<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
-<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
-
+<!doctype html>
+<html lang="">
+  
   {% set site = get('site') %}
-
+  
   <head>
     <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>{% block title %}{{ site.name }}{% endblock %}</title>
-    <meta name="description" content="">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="{{ site.description }}">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <!--<link rel="shortcut icon" href="/static/images/favicon.png">
-    <link rel="apple-touch-icon icon-precomposed" href="/static/images/apple-touch-icon.png"/>-->
     
-    <link rel="stylesheet" type="text/css" href="/assets/css/normalize.css" />
-    <link rel="stylesheet" type="text/css" href="/assets/css/style.css" />
+    <title>{% block title %}{{ site.name }}{% endblock %}</title>
 
+    <link rel="shortcut icon" href="/assets/favicon.ico">
+    
+    <!-- Add to homescreen for Chrome on Android -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <link rel="icon" sizes="192x192" href="/assets/images/touch/chrome-touch-icon-192x192.png">
+
+    <!-- Add to homescreen for Safari on iOS -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="Web Starter Kit">
+    <link rel="apple-touch-icon-precomposed" href="/assets/apple-touch-icon-precomposed.png">
+
+    <!-- Tile icon for Win8 (144x144 + tile color) -->
+    <meta name="msapplication-TileImage" content="/assets/images/touch/ms-touch-icon-144x144-precomposed.png">
+    <meta name="msapplication-TileColor" content="#3372DF">
+
+    <!-- Page styles -->
+    <link rel="stylesheet" href="/assets/styles/main.css">
+    
     {% block head_extra %}{% endblock %}
+  </head>
+  <body>
+
+    {% include "header.html" %}
+    
+    {% block body %}
+        <!--[if lt IE 7]>
+          <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://whatbrowser.org/">upgrade your browser</a> to improve your experience.</p>
+        <![endif]-->
+    
+      <main>
+        
+        {% block content %}
+          <h1 id="hello">Hello!</h1>
+          <p>Welcome to your pubhook starter site!</p>
+          <p>This site uses <a href="http://developers.google.com/web/starter-kit">Web Starter Kit</a>'s SASS components for base styling.</p>
+          <p>Read how to <a href="http://developers.google.com/web/starter-kit">Get Started with WSK</a> or check out the included <a href="/assets/styleguide.html" target="_blank">Style Guide</a> that also reflects the changes you make to WSK's base styles.</p>
+
+          <h2 id="get-started">Get Started with pubhook.</h2>
+          <p>For a full overview of the components of a pubhook project please check the <a href="http://github.com/sterlingwes/pubhook" target="_blank">Github Repo</a>.</p>
+        {% endblock %}
+
+      </main>
+    
+    {% endblock %}
+    
+    {% include "footer.html" %}
+
+    <!-- build:js scripts/main.min.js -->
+    <script src="/assets/scripts/main.js"></script>
+    <!-- endbuild -->
+    
+    {{ getAppScript('main') }}
+    {% block foot_extra %}{% endblock %}
     
     {% set analytics = getSetting('analytics_id')%}
     {% if analytics %}
       <script>
-        var _gaq=[['_setAccount','{{ analytics }}'],['_trackPageview']];
-        (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
-        g.src='//www.google-analytics.com/ga.js';
-        s.parentNode.insertBefore(g,s)}(document,'script'));
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+        ga('create', '{{ analytics }}', 'auto');
+        ga('send', 'pageview');
       </script>
     {% endif %}
-  </head>
-  <body>
-    <div id="layout">
-      
-      {% block body %}
-        <!--[if lt IE 7]>
-          <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://whatbrowser.org/">upgrade your browser</a> to improve your experience.</p>
-        <![endif]-->
-
-        {% include "header.html" %}
-
-        <div id="content">
-          {% block content %}{% endblock %}
-        </div>
-
-        {% include "footer.html" %}
-
-      {% endblock %}
-    
-      {{ getAppScript('main') }}
-      {% block foot_extra %}{% endblock %}
-      
-    </div>
   </body>
 </html>
