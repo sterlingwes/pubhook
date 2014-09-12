@@ -64,7 +64,15 @@ module.exports = {
       return {
         
         index: function(done) {
-          var cursor = collection.find({});
+          var options = {};
+          if(m.sortBy) {
+            var sort = [];
+            for(var key in m.sortBy) {
+              sort.push([key,m.sortBy[key]]);
+            }
+            if(sort.length) options.sort = sort;
+          }
+          var cursor = collection.find({}, options);
           return cursor.toArray(function(err,res) {
             if(err) return done(err);
             done(null, res);

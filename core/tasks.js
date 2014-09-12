@@ -26,8 +26,10 @@ var gulp = require('gulp')
             +'{% block content %}' + content + '{% endblock %}';
   }
   , stringSrc = function(files) {
-      var src = stream.Readable({ objectMode: true });
+      var idx = 0
+        , src = stream.Readable({ objectMode: true });
       src._read = function() {
+        // files can be an object, where i can be the file name, not an index  TODO: make consistent
         _.each(files, function(f,i) {
           if(!f) return;
           var body = typeof f.body === 'function' ? f.body() : f.body
@@ -44,7 +46,10 @@ var gulp = require('gulp')
           });
           
           this.push(new gutil.File({ cwd:"", base:"", path: uri, contents: new Buffer( swigWrap(body) ) }));
-          this.push(null);
+          if(idx==(_.size(files)-1)) {
+            this.push(null); // EOF needs to be last
+          }
+          idx++;
         }.bind(this));
       };
       return src;

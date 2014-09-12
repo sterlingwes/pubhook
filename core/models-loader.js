@@ -50,13 +50,10 @@ module.exports = function(models, test) {
       case "mongodb":
         // TODO: will need a global config for host / port / db (and per-model overrides)
         if(!m.collection) return done("No collection name specified for mongo model "+name);
-        mongo.adapter({ host: 'localhost', port: 27017 })
-          .then(function(conn) {
-            var cli = conn.cli
-              , db = cli.db(m.dbName || 'pubhook')
-              , cursor = db.collection(m.collection).find({});
+        mongo.resourceHandlers(m, { host: 'localhost', port: 27017 })
+          .then(function(actions) {
             
-            return cursor.toArray(function(err,res) {
+            actions.index(function(err,res) {
               if(err) return done(err);
               done(null, _.extend(m, { items: _.map(res, function(r) {
                 r.__uri = slug(m.renderEachBy, r);

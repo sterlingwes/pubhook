@@ -4,6 +4,10 @@ module.exports = {
   
   collection: 'posts',
   
-  renderEachBy: 'posts/are/great/{title}'
+  renderEachBy: 'blog/{title}',
+  
+  sortBy: {
+    title: -1
+  }
   
 };

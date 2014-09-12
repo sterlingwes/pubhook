@@ -1,0 +1,19 @@
+{# Post Index #}
+
+{# Extend the base template #}
+{% extends "../templates/partials/base.html" %}
+
+{% block content %}
+  <section class="g-wide--3 g-wide--last g-medium--half g--last">
+    <h2 class="subsection-title">Blog</h2>
+    
+    {% set posts = get('posts') %}
+    
+    {% for post in posts %}
+    <article>
+      <h3>{{ post.title }}</h3>
+      {{ post.body}}
+    </article>
+    {% endfor %}
+  </section>
+{% endblock %}
