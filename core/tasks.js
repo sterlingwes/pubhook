@@ -1,11 +1,9 @@
 var gulp = require('gulp')
   , fs = require('fs')
   , sequence = require('run-sequence')
-  , gutil = require('gulp-util')
   , streamdata = require('gulp-data')
   , swig = require('gulp-swig')
   , plumr = require('gulp-plumber')
-  , stream = require('stream')
   , rename = require('gulp-rename')
   , webpack = require('gulp-webpack')
   , changed = require('gulp-changed')
@@ -21,39 +19,7 @@ var gulp = require('gulp')
   , onError = function(err) {
       console.warn(err.stack);
   }
-  , swigWrap = function(content) {
-      return '{% extends "../templates/partials/base.html" %}'
-            +'{% block content %}' + content + '{% endblock %}';
-  }
-  , stringSrc = function(files) {
-      var idx = 0
-        , src = stream.Readable({ objectMode: true });
-      src._read = function() {
-        // files can be an object, where i can be the file name, not an index  TODO: make consistent
-        _.each(files, function(f,i) {
-          if(!f) return;
-          var body = typeof f.body === 'function' ? f.body() : f.body
-          
-          // add cwd so swigWrap template extends correct base (needs to be two deeper than root)
-          // hackish: uses tilde to force only two directories after root, and renames within gulp stream
-            , uri = f.__uri && /\.md$/.test(f.__uri)===false ? cwd + '/.dbrender/' + f.__uri.replace(/\//g,'~') : (f.name || 'item-' + i);
-          
-          // add to our sitemapping
-          sitemap.set(f.__uri || uri, {
-            name: f.__name,
-            id: f._id,
-            index: i
-          });
-          
-          this.push(new gutil.File({ cwd:"", base:"", path: uri, contents: new Buffer( swigWrap(body) ) }));
-          if(idx==(_.size(files)-1)) {
-            this.push(null); // EOF needs to be last
-          }
-          idx++;
-        }.bind(this));
-      };
-      return src;
-  }
+  , stringSrc = require('./tasks-stringSrc')
 
   , typeWhitelist = [
     'css','js','png','jpg','jpeg','gif','webapp','txt','ico','html','woff2','woff','ttf','svg','eot'
@@ -91,7 +57,7 @@ module.exports = function(folders, models, data/* models */, isWatching) {
     ;
   
   if(!isRenderable.length)
-    isRenderable = false
+    isRenderable = false;
   
   // clean build directory
   gulp.task('clean', function() {
@@ -159,12 +125,14 @@ module.exports = function(folders, models, data/* models */, isWatching) {
     gulp.task('renderMarkdown', function() {
       console.log('- renderMarkdown');
       var modelData = models.data();
-      return stringSrc(data.markdown)
+      return stringSrc(data.markdown.items)
         .pipe(plumr({ errorHandler: onError }))
-        .pipe(streamdata(modelData))
+        //.pipe(streamdata(modelData)) don't need this.. yet?
         .pipe(swig())
         .pipe(rename(function(path) {
-          path.dirname = path.dirname.replace(/markdown\/?/,'');
+          var base = path.basename.split('~');
+          path.basename = base.pop();
+          path.dirname = base.join('/');
         }))
         .pipe(gulp.dest(paths.build));
     });

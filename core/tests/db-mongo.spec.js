@@ -4,7 +4,7 @@ describe('mongo engine', function() {
   
   it('should connect', function(done) {
     
-    mongo({ host: 'localhost', port: 27017 })
+    mongo.adapter({})
       .then(function(conn) {
         expect('close' in conn.cli).toBe(true);
         conn.close();

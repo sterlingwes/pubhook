@@ -27,11 +27,10 @@ var getPath = function(req) {
 
 // onLoad handle loading with sync
 var getModels = function() {
-  if(arguments[0])  glob = arguments[0]; // override for testing
   
   var ms = _.groupBy(_.map(glob.sync(cwd+'/models/*.js'), function(m) {
     var name = m.match(/models\/([a-z\-\_\.0-9]+)\.js$/i);
-    return _.extend(require(m), {
+    return _.extend({}, require(m), {
       __path: m, 
       __name: name && name[1]
     });
@@ -86,8 +85,8 @@ module.exports = {
           db.resourceHandlers(resource).then(function(actions) {
             switch(req.method) {
                 case "GET":
-                  if(!actions.index) { console.warn('! No index() action for '+resource.pubhookType); return next(); }
-                  return actions.index(res.toJson);
+                  if(!actions.read) { console.warn('! No read() action for '+resource.pubhookType); return next(); }
+                  return actions.read(res.toJson);
                 case "POST":
                   return actions.create(req.body, res.toJson);
             }
@@ -96,6 +95,9 @@ module.exports = {
       }
     };
   },
+  
+  // TODO: needs to use an array of promises to resolve issue in } else {}
+  // this block is currently UNUSED
   
   getEndpoints: function(done, models) {
     if(!models)

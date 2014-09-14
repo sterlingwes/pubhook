@@ -1,20 +1,18 @@
-var api = require('../api-server')
-  , cwd = process.cwd();
-
-if(!/tests$/.test(cwd)) cwd += '/tests';
+var api = require('../api-server');
 
 describe('api-server', function() {
   
   it('should get models', function() {
     
-    var models = api.getModels({sync: function() {
-      return [cwd+'/models/markdown.js',cwd+'/models/db-mongo.site.js',cwd+'/models/db-mongo.mongo.js'];
-    }});
+    var models = api.getModels();
     
-    expect(Object.keys(models)).toEqual(['markdown','db-mongo.site','db-mongo.mongo']);
+    expect(Object.keys(models)).toEqual([
+      'markdown', 'posts', 'site'
+    ]);
     
   });
   
+  /*
   it('should know endpoints', function(done) {
     
     var endpoints = api.getEndpoints(function(eps) {
@@ -22,7 +20,7 @@ describe('api-server', function() {
       done();
     });
     
-  });
+  });*/
   
   it('should parse request url', function() {
     

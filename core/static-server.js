@@ -25,6 +25,7 @@ module.exports = function(port) {
   // if we didn't serve anything check that it wasn't b/c of a folder conflict
   server.use(function(req,res,next) {
     if( ! /\.html$/.test(req.url)) {
+      req.url = req.url.replace(/\/$/,'');
       req.url += '.html';
       var path = process.cwd() + '/public' + req.url;
       fs.exists(path, function(exists) {

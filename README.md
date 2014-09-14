@@ -60,6 +60,33 @@ Models are where you will define your model schema and validation rules and form
 
 You can also define "static" models that are essentially json objects made available to your templates.
 
+Example:
+
+```
+module.exports = {
+  
+  pubhookType: 'mongo',
+  
+  collection: 'posts',
+  
+  connection: {
+    host: 'localhost',
+    port: '27017'
+  },
+  
+  renderEachBy: 'blog/{title}',
+  
+  sortBy: {
+    title: -1
+  }
+  
+};
+```
+
+If you omit `pubhookType`, it's assumed your export is a "raw model" in that the object itself would be passed to the views that require it for rendering. See the `models/site.json`.
+
+For markdown and other file-based model options, you may use `source` to indicate where the files should be found if the name of the folder differs from the name of the model.
+
 ### Pages
 
 Similar to the markdown folder, pages allow you to generate pages by extending your templates. The naming is directly transferable to the public folder: `pages/index.html` >> `public/index.html`.

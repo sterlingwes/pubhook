@@ -2,72 +2,10 @@ module.exports = function(models, test) {
   
   var glob = test ? test.glob : require('glob')
     , Promise = require('es6-promise').Promise
-    , slug = require('./model-parse-data')
     , cwd = process.cwd()
     , modelPath = './models'
-    , readMdFiles = require('./models-md')
-    , _ = require('lodash')
-
-    // TODO: will need a way to plug-in other engines
-    , mongo = require('./db-mongo')
+    , fetchModel = require('./models-fetcher').fetcher
   ;
-
-  /*
-   * fetchModel - retrieves data depending on the pubhookType specified in the model schema
-   * 
-   * @param {String} name of the model (from the filename)
-   * @param {Object} m the model object itself (from require'd file)
-   * @param {Function} done callback
-   */
-  var fetchModel = function(name,m,done) {
-    if(!m || typeof m !== 'object') {
-      console.warn('! Warning - no valid export found for model "' + name + '"');
-      return false;
-    }
-
-    switch(m.pubhookType) {
-      case "markdown":
-        var source = './' + (m.source ? m.source.replace(/^[\/\.]+/,'') : 'markdown');
-        glob(source + '/*.md', function(err,files) {
-          readMdFiles(files.map(function(f) { return f.replace(/^\.+/,cwd); }), function(err,res) {
-            if(err) return console.warn(err);
-            var groupedByFile = _.groupBy(_.map(res, function(r) {
-              if(r.attributes) {
-                r.__uri = r.attributes.uri || r.name;
-                r.__name = name;
-              }
-              return r;
-            }),'name');
-            _.each(groupedByFile, function(files,k) {
-              if(files.length==1)
-                groupedByFile[k] = files[0];
-            });
-            done(err, groupedByFile);
-          });
-        });
-        break;
-      case "mongo":
-      case "mongodb":
-        // TODO: will need a global config for host / port / db (and per-model overrides)
-        if(!m.collection) return done("No collection name specified for mongo model "+name);
-        mongo.resourceHandlers(m, { host: 'localhost', port: 27017 })
-          .then(function(actions) {
-            
-            actions.index(function(err,res) {
-              if(err) return done(err);
-              done(null, _.extend(m, { items: _.map(res, function(r) {
-                r.__uri = slug(m.renderEachBy, r);
-                r.__name = name;
-                return r; 
-              }) }));
-            });
-            
-          }).catch(function(err) { done(err); });
-        break;
-      default:
-        done(null, m); // unknown type, assume raw values as data
-    }
-  };
 
   /*
    * loader - iterates over all files in the model directory and loads them into memory
@@ -112,7 +50,7 @@ module.exports = function(models, test) {
 
         }).catch(function(err) {
           console.warn('! Error loading models');
-          console.log(err);
+          console.log(err.stack);
         });
       }
     });
