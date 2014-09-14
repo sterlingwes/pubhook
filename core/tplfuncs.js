@@ -48,12 +48,48 @@ module.exports = function(sitemap) {
      },
      
      /*
+      * isActiveCtx
+      * 
+      * check whether the uri of the current context is the active one (useful for colouring links)
+      * 
+      * @param {Object} ctx context
+      * @param {String} uri to test for
+      * @return {Boolean} true if is active uri
+      */
+     isActiveCtx: function(ctx, uri) {
+       return ctx.__uri == uri;
+     },
+     
+     /*
+      * isActiveUriBuilder
+      * 
+      * useful for avoiding having to pass the context in template tags.. used internally to provide "isActiveUri" to some templates
+      */
+     isActiveUriBuilder: function(ctx) {
+       return function(uri) {
+         return ctx.__uri == uri;
+       };
+     },
+     
+     /*
       * getById
+      * 
+      * grab a specific record from a specific model
+      * 
+      * @param {String} name of model
+      * @param {String} id to look by
+      * @return {Object} record (hopefully!)
       */
      getById: getById,
      
      /*
       * menuChildOrSibling
+      * 
+      * provides list of objects corresponding to either children or (failing that) siblings of the passed context
+      * 
+      * @param {String} name of model
+      * @param {Object} ctx context
+      * @return {Array} of objects
       */
      menuChildOrSibling: function(name,ctx) {
        return (ctx._children || ctx._siblings).map(function(c) {

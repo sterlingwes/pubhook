@@ -25,16 +25,25 @@ templatePaths.forEach(function(path) {
 
 var swigWrap = function(content, item) {
   
-  var titleBlock = '{% block title %}{% parent %} - '+(item.attributes ? item.attributes.title : (item.title || ''))+'{% endblock %}';
+  var titleBlock = '{% block title %}{% parent %} - '+(item.attributes ? item.attributes.title : (item.title || ''))+'{% endblock %}'
+    , helpers = [];
+  
+  helpers.push(['ctx', JSON.stringify(item)]);
+  helpers.push(['isActiveUri', 'isActiveUriBuilder(ctx)']);
+  
+  var helperTags = _.map(helpers, function(help) {
+    return '{% set ' + help.join(' = ') + ' %}';
+  }).join("\n");
   
   if(item && templates[item.__name]) {
-    var c= "{% set ctx = " + JSON.stringify(item) + " %}"
+    var c = helperTags
           + titleBlock
           + templates[item.__name].replace(/\{\{\s+?CONTENT\s+?\}\}/,content);
     return c;
   }
   
   return '{% extends "../templates/partials/base.html" %}'
+        + helperTags
         + titleBlock
         +'{% block content %}' + content + '{% endblock %}';
 };
