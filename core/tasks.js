@@ -127,7 +127,7 @@ module.exports = function(folders, models, data/* models */, isWatching) {
       var modelData = models.data();
       return stringSrc(data.markdown.items)
         .pipe(plumr({ errorHandler: onError }))
-        //.pipe(streamdata(modelData)) don't need this.. yet?
+        .pipe(streamdata(modelData))
         .pipe(swig())
         .pipe(rename(function(path) {
           var base = path.basename.split('~');

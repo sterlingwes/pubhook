@@ -1,0 +1,30 @@
+{# A Markdown Post #}
+
+{# Extend the base template #}
+{% extends "../partials/base.html" %}
+
+{% block sidebar %}
+  <aside class="g-wide--1 g-medium--1">
+    <ul class="list-links list-links--primary">
+      {% if ctx._parent%}
+        <li class="list__item">
+          <a href="/{{ ctx._parent }}">{{ getById('markdown',ctx._parent).attributes.title }}</a>
+        </li>
+      {% endif %}
+      {% for menuItem in menuChildOrSibling('markdown', ctx) %}  
+        <li class="list__item">
+          <a href="/{{ menuItem._id }}">{{ menuItem.attributes.title }}</a>
+        </li>
+      {% endfor %}
+    </ul>
+  </aside>
+{% endblock %}
+
+{% block content %}
+  <section class="g-wide--3 g-wide--last g-medium--2 g--last">
+    <h2>{{ ctx.attributes.title }}</h2>
+    
+    {{ CONTENT }}
+    
+  </section>
+{% endblock %}

@@ -1,9 +1,10 @@
-var md = require('../fs-markdown');
+var md = require('../fs-markdown')
+  , cwd = process.cwd();
 
 describe('fs-markdown loader', function() {
   
   it('should listFiles', function(done) {
-    md._listFiles(require('./models/markdown'), function(err,files) {
+    md._listFiles(require(cwd + '/models/markdown'), function(err,files) {
       var markdownFiles = [
         
         'a page',
@@ -18,13 +19,17 @@ describe('fs-markdown loader', function() {
   });
   
   it('should readMdFiles', function(done) {
-    md.adapter(require('./models/markdown')).then(function(files) {
+    md.adapter(require(cwd + '/models/markdown')).then(function(files) {
+      
+      //console.log(JSON.stringify(files,null, ' '));
       
       expect(files.length).toEqual(3);
       expect(files[0].attributes.title).toEqual('Oh, Hey.md');
-      expect(files[0].children.length).toEqual(2);
+      expect(files[0]._children.length).toEqual(2);
       expect(files[1].attributes.title).toEqual('Some Ipsum');
+      expect(files[1]._parent).toEqual('a-page');
       expect(files[2].attributes.title).toEqual('Some Lorem');
+      expect(files[2]._parent).toEqual('a-page');
       
       done();
     })

@@ -1,3 +1,5 @@
+var _ = require('lodash');
+
 /*
  * template functions
  * 
@@ -8,7 +10,14 @@
 module.exports = function(sitemap) {
   
   return function(data, vars) {
-
+    
+    var getById = function(name,id) {
+      if(!data[name] || !data[name].items) return;
+      return _.find(data[name].items, function(d) {
+        return d._id == id;
+      });
+    };
+    
    return {
      
      /*
@@ -36,6 +45,21 @@ module.exports = function(sitemap) {
      getAppScript: function(ref) {
        var script = vars['app:link:'+ref.toLowerCase()] || 'SCRIPT_NOT_FOUND';
        return '<script src="/scripts/'+script+'.js"></script>';
+     },
+     
+     /*
+      * getById
+      */
+     getById: getById,
+     
+     /*
+      * menuChildOrSibling
+      */
+     menuChildOrSibling: function(name,ctx) {
+       return (ctx._children || ctx._siblings).map(function(c) {
+         var rec = getById(name, c);
+         return rec;
+       });
      }
 
    };

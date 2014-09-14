@@ -5,6 +5,7 @@ var Promise = require('es6-promise').Promise
   , mdyaml = require('front-matter')
   , marked = require('marked')
   , _ = require('lodash')
+  , slug = require('uslug')
 ;
 
 /*
@@ -61,28 +62,45 @@ var adapter = function(m) {
       Promise.all(readMdFiles(files.map(function(f) { return f.replace(/^\.+/,cwd); })))
         .then(function(res) {
 
-          // do any special md processing here (like adding children to their parents)
-          var fnames = _.map(_.pluck(res,'_id'), function(fn) {
-              return fn.replace(cwd+'/'+(m.source ? m.source.replace(/^[\/\.]+/,'') : 'markdown') + '/','').replace(/\.md$/,'');
-            })
-            , harch = {};
+          // TODO: more efficient use of iteration & lookups. Need a hashmap of sorts
         
-          // determine which files are children of another and track
-          fnames.forEach(function(f,i) {
-            res[i]._id = f;
-            harch[f] = _.filter(fnames, function(ff) {
-              return ff.indexOf(f)===0 && f.length < ff.length;
+          // do any special md processing here (like adding children to their parents)
+          var fnames = _.map(_.pluck(res,'_id'), function(fn, i) {
+              var shrunk = slug(fn.replace(cwd+'/'+(m.source ? m.source.replace(/^[\/\.]+/,'') : 'markdown') + '/','').replace(/\.md$/,''), {allowedChars: '_-/'});
+              res[i]._id = shrunk;
+              return shrunk;
+            })
+            , hasChildren = {}
+            , hasSiblings = {}
+            , parents = {};
+        
+          // determine which files have children
+          fnames.forEach(function(fname,i) {
+            
+            hasChildren[fname] = _.filter(fnames, function(name) {
+              return name.indexOf(fname)===0 && fname.length < name.length;
+            });
+            
+            // add those chillins to the parent tracker
+            hasChildren[fname].forEach(function(child) {
+              parents[child] = fname;
             });
           });
         
           // add children as necessary
-          res.forEach(function(f,i) {
-            var children = harch[f._id];
+          res = res.map(function(f,i) {
+            var children = hasChildren[f._id];
             if(children.length) {
-              res[i].children = children;
+              f._children = children;
             }
+            if(parents[f._id]) {
+              f._parent = parents[f._id];
+              if(f._parent)
+                f._siblings = hasChildren[f._parent];
+            }
+            return f;
           });
-          
+        
           yes(res);
 
         })

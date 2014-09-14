@@ -26,6 +26,7 @@ Here we'll list progress towards 1.0.
 *   _0.2.0_ MongoDB adaptor
 *   _0.2.5_ Render from database adaptors
 *   _0.2.9_ Support for SASS and Web Starter Kit as base styling
+*   _0.3.0_ Support for hierarchy for fs-based models & model specific templates
 
 ## Usage
 
@@ -83,7 +84,7 @@ module.exports = {
 };
 ```
 
-If you omit `pubhookType`, it's assumed your export is a "raw model" in that the object itself would be passed to the views that require it for rendering. See the `models/site.json`.
+If you omit `pubhookType`, it's assumed your export is a "raw model" in that the object itself would be passed to the views that require it for rendering. See the `models/site.json` example.
 
 For markdown and other file-based model options, you may use `source` to indicate where the files should be found if the name of the folder differs from the name of the model.
 
