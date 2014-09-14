@@ -34,6 +34,10 @@ body.open {
   overflow: hidden;
 }
 
+a.active {
+  color: #000;
+}
+
 .app-bar {
   display: block;
   width: 100%;
@@ -197,6 +201,12 @@ main {
   -webkit-transition: background-color 0.2s ease-out;
           transition: background-color 0.2s ease-out;
   white-space: nowrap;
+  
+  &.active {
+    background-color: white;
+    color: #4285f4;
+    font-weight: bold;
+  }
 }
 
 .navdrawer-container ul li {

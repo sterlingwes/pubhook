@@ -4,11 +4,18 @@
 {% extends "../partials/base.html" %}
 
 {% block sidebar %}
+
   <aside class="g-wide--1 g-medium--1">
     <ul class="list-links list-links--primary">
-      {% if ctx._parent%}
+      {% if ctx._parent or ctx._children %}
         <li class="list__item">
-          <a href="/{{ ctx._parent }}">{{ getById('markdown',ctx._parent).attributes.title }}</a>
+          <a href="/{% if ctx._parent %}{{ ctx._parent }}{% else %}{{ ctx._id }}{% endif %}" class="{% if !ctx._parent %}active{% endif %}">
+            {% if ctx._parent %}
+              {{ getById('markdown',ctx._parent).attributes.title }}
+            {% else %}
+              {{ ctx.attributes.title }}
+            {% endif %}
+          </a>
         </li>
       {% endif %}
       {% for menuItem in menuChildOrSibling('markdown', ctx) %}  

@@ -21,7 +21,7 @@ describe('fs-markdown loader', function() {
   it('should readMdFiles', function(done) {
     md.adapter(require(cwd + '/models/markdown')).then(function(files) {
       
-      //console.log(JSON.stringify(files,null, ' '));
+      console.log(JSON.stringify(files,null, ' '));
       
       expect(files.length).toEqual(3);
       expect(files[0].attributes.title).toEqual('Oh, Hey.md');

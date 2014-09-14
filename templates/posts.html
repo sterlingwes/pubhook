@@ -1,0 +1,14 @@
+{# A Blog Post #}
+
+{# Extend the base template #}
+{% extends "../partials/base.html" %}
+
+{% block content %}
+  <section class="g-wide--3 g--centered g-medium--2 g--last">
+    
+    <h2>{{ ctx.title }}</h2>
+    
+    {{ CONTENT }}
+    
+  </section>
+{% endblock %}
