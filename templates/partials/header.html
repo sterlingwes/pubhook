@@ -12,9 +12,9 @@
 <nav class="navdrawer-container promote-layer">
   <h4>Navigation</h4>
   <ul>
-    <li><a href="/#hi_there">Hello</a></li>
-    <li><a href="/a-page">A Page</a></li>
-    <li><a href="/blog">A Blog</a></li>
+    <li>{{ a('Hello', { href: "/#hi_there" }) }}</li>
+    <li>{{ a('A Page', { href: "/a-page" }) }}</li>
+    <li>{{ a('A Blog', { href: "/blog" }) }}</li>
     <li><a href="/assets/styleguide.html" target="_blank">A Style Guide</a></li>
   </ul>
 </nav>

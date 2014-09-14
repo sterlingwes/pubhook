@@ -1,6 +1,6 @@
 {
   "name": "pubhook",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "",
   "main": "start.js",
   "dependencies": {
@@ -8,10 +8,10 @@
     "swig": "",
     "gulp": "~3.8.7",
     "gulp-data": "~1.0.2",
+    "gulp-rename": "git://github.com/sterlingwes/gulp-rename",
     "gulp-swig": "~0.7.2",
     "lodash": "~2.4.1",
     "gulp-plumber": "~0.6.4",
-    "gulp-rename": "~1.2.0",
     "es6-promise": "~1.0.0",
     "front-matter": "~0.2.0",
     "marked": "~0.3.2",

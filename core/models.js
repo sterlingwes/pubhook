@@ -19,9 +19,26 @@ var setVar = function(key,val) {
   return true;
 };
 
-var prepData = function() {
-  var fns = new Functions(models, vars);
-  return _.extend({}, fns);
+/*
+ * prepData
+ * 
+ * called as model.data from tasks.js
+ * which itself is primarily used by gulp-data to augment file.data in the stream
+ * 
+ * @param {Object} file, vinyl direct from gulp stream via gulp-data
+ * @return {Object} augmented data
+ */
+var prepData = function(file) {
+  var fns = new Functions(models, vars)
+    , fileData = file && file.data ? file.data : {};
+  
+  _.each(fns, function(fn,key) {
+    if(typeof fn === 'function') {
+      fns[key] = fn.bind(fileData.ctx || {});
+    }
+  });
+  
+  return _.extend(fileData, fns);
 };
 
 var closeDbs = function() {

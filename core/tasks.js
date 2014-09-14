@@ -114,7 +114,17 @@ module.exports = function(folders, models, data/* models */, isWatching) {
       
       return gulp.src(paths.pages)
         .pipe(plumr({ errorHandler: onError }))
-        .pipe(streamdata(models.data()))
+        .pipe(streamdata(function(file) {
+          var uri = file.path.replace(cwd,'').replace(/\\/g,'/').replace('/pages/','').replace(/\.html$/,'');
+          file.data = file.data || {};
+          if(uri=='index')
+            uri = '';
+        
+          // TODO: need to handle accounting for _children and _parent here as per markdown!
+        
+          _.extend(file.data, { ctx: { __uri: uri }});
+          return models.data(file);
+        }))
         .pipe(swig())
         .pipe(gulp.dest(paths.build));
     });
@@ -124,12 +134,11 @@ module.exports = function(folders, models, data/* models */, isWatching) {
   if(hasMd) {
     gulp.task('renderMarkdown', function() {
       console.log('- renderMarkdown');
-      var modelData = models.data();
       return stringSrc(data.markdown.items)
         .pipe(plumr({ errorHandler: onError }))
-        .pipe(streamdata(modelData))
+        .pipe(streamdata(models.data))
         .pipe(swig())
-        .pipe(rename(function(path) {
+        .pipe(rename(function(path, file) {
           var base = path.basename.split('~');
           path.basename = base.pop();
           path.dirname = base.join('/');
@@ -142,12 +151,11 @@ module.exports = function(folders, models, data/* models */, isWatching) {
   if(isRenderable) {
     gulp.task('renderRenderable', function() {
       console.log('- renderRenderable');
-      var modelData = models.data();
       return stringSrc(_.flatten(_.pluck(isRenderable,'items')))
         .pipe(plumr({ errorHandler: onError }))
-        .pipe(streamdata(modelData))
+        .pipe(streamdata(models.data))
         .pipe(swig())
-        .pipe(rename(function(path) {
+        .pipe(rename(function(path, file) {
           var base = path.basename.split('~');
           path.basename = base.pop();
           path.dirname = base.join('/');

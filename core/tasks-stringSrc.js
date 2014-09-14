@@ -28,8 +28,9 @@ var swigWrap = function(content, item) {
   var titleBlock = '{% block title %}{% parent %} - '+(item.attributes ? item.attributes.title : (item.title || ''))+'{% endblock %}'
     , helpers = [];
   
-  helpers.push(['ctx', JSON.stringify(item)]);
-  helpers.push(['isActiveUri', 'isActiveUriBuilder(ctx)']);
+  // handling this in the task streamData from models.js so it's all in one place for everything...
+      //helpers.push(['ctx', JSON.stringify(item)]);
+      //helpers.push(['isActiveUri', 'isActiveUriBuilder(ctx)']);
   
   var helperTags = _.map(helpers, function(help) {
     return '{% set ' + help.join(' = ') + ' %}';
@@ -70,7 +71,9 @@ module.exports = function(files) {
           index: i
         });
 
-        this.push(new gutil.File({ cwd:"", base:"", path: uri, contents: new Buffer( swigWrap(body, f) ) }));
+        var vinylFile = new gutil.File({ cwd:"", base:"", path: uri, contents: new Buffer( swigWrap(body, f) ) });
+        vinylFile.data = { ctx: f };
+        this.push(vinylFile);
         if(idx==(_.size(files)-1)) {
           this.push(null); // EOF needs to be last
         }

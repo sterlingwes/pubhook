@@ -18,7 +18,7 @@
           </a>
         </li>
       {% endif %}
-      {% for menuItem in menuChildOrSibling('markdown', ctx) %}  
+      {% for menuItem in menuChildOrSibling('markdown') %}  
         <li class="list__item">
           <a href="/{{ menuItem._id }}" class="{% if isActiveUri(menuItem.__uri) %}active{% endif %}">{{ menuItem.attributes.title }}</a>
         </li>
