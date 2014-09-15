@@ -1,4 +1,5 @@
-var _ = require('lodash');
+var _ = require('lodash')
+  , renderer = require('./server-renderer');
 
 /*
  * template functions
@@ -32,6 +33,45 @@ module.exports = function(sitemap) {
        var d = data[name];
        if(d && d.items) return d.items; // if it's a database resource, don't pass the model schema
        return data[name];
+     },
+     
+     /*
+      * getReactApp
+      * 
+      * bootstraps a react app, same as writing your own React.renderComponent code
+      * 
+      * @param {String} ref name of webpack app that hosts react root
+      * @param {Object} data (optional)
+      * @return {String}
+      */
+     getReactApp: function(ref,data) {
+       ref = ref.toLowerCase();
+       
+        // our rendered component html, added to our static page rendering
+       var rendered = renderer(ref,data)
+       
+        // global ref for bootstrapping inline once the page is loaded, also the container #id
+         , globalRef = 'ph-app-'+ref
+       
+        // container
+         , div = '<div id="'+globalRef+'">'+rendered+'</div>'
+       
+        // the app script itself, same call as getAppScript helper, below
+         , script = vars['app:link:'+ref] || 'SCRIPT_NOT_FOUND'
+         , app = '<script src="/scripts/'+script+'.js"></script>'
+       
+        // inline bootstrapping on client rendering
+         , warn = 'Cannot mount missing app: '+ ref +'. Have you used pubhook/tools/mount-react?'
+         , js = '<script>'
+                + 'var app = window["'+globalRef+'"]('+JSON.stringify(data||{})+');'
+                + 'if(!app || typeof app !== "object") { console.warn("'+warn+'"); } else {'
+                + 'React.renderComponent(app,'
+                + 'document.querySelector("#'+globalRef+'")); }'
+                +'</script>'
+       ;
+       
+       return [div,app,js].join("\n"); // pretty!
+       
      },
 
      /*

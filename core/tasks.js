@@ -69,13 +69,10 @@ module.exports = function(folders, models, data/* models */, isWatching) {
   if(hasApps) {
     gulp.task('webpack', function() {
       console.log('- bundling apps');
+      var wpConfig = require('./webpack-defaults');
       return gulp.src(paths.apps + '/**/entry.js')
         .pipe(plumr({ errorHandler: onError }))
-        .pipe(webpack({
-          resolve: {
-            modulesDirectories: ['node_modules', 'bower_components']
-          }
-        }, null/* webpack override */, function(err, stats) {
+        .pipe(webpack(wpConfig, null/* webpack override */, function(err, stats) {
           if(err) console.log('- webpack err: ' + err);
           else {
             stats = stats.toJson();

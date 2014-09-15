@@ -27,6 +27,7 @@ Here we'll list progress towards 1.0.
 *   _0.2.5_ Render from database adaptors
 *   _0.2.9_ Support for SASS and Web Starter Kit as base styling
 *   _0.3.0_ Support for hierarchy for fs-based models & model specific templates
+*   _0.3.2_ Server side rendering of Reactjs components
 
 ## Usage
 
