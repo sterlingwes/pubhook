@@ -222,6 +222,10 @@ main {
 
 .navdrawer-container ul li a:hover {
   background-color: rgba(255, 255, 255, 0.2);
+  
+  &.active {
+    color: white;
+  }
 }
 
 .navdrawer-container ul li a:focus {
