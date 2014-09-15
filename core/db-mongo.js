@@ -7,25 +7,32 @@ var Mongo = require('mongodb')
 
   // reference handle to current connection instance
   , connected
+  , connecting
 
   , adapter = function(config) {
 
       if(!config || !config.connection)
         config = { connection: { host: 'localhost', port: 27017 } };
-
+    
+      if(connecting) return connecting;
+    
       // hold a reference handle so we only connect once
       if(connected) return { then: function(cb) { cb(connected); return { catch: function() {} }; } };
 
       // otherwise return an actual promise
-      return new Promise(function(yes,no) {
+      connecting = new Promise(function(yes,no) {
+        console.log('- Opening mongo connection ', config.connection.host+':'+config.connection.port);
         var cli = new Client(new Server(config.connection.host, config.connection.port), { native_parser: true });
+        connected = cli;
         cli.open(function(err,cli) {
           if(err) return no(err);
+          connecting = false;
           connected = cli;
           require('./models').setVar('mongo', true);
           yes({
             cli:    cli,
             close:  function() {
+              console.log('- Closing mongo connection');
               cli.close();
               connected = false;
               require('./models').setVar('mongo', false);
@@ -33,6 +40,8 @@ var Mongo = require('mongodb')
           });
         });
       });
+    
+      return connecting;
 
     }
 ;

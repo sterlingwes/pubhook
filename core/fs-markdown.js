@@ -18,7 +18,10 @@ var listFiles = function(m, listed) {
   
   var source = './' + (m.source ? m.source.replace(/^[\/\.]+/,'') : 'markdown');
   glob(source + '/**/*.md', function(err,files) {
-    listed(err,files);
+    listed(err,files.filter(function(f) {
+      f = f.split('/').pop();
+      return f[0] !== '_'; // allow for hiding files from rendering / consuming
+    }));
   });
   
 };
