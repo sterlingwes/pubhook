@@ -1,26 +1,16 @@
-var api = require('../api-server');
+var api = require('../server-api-crud');
 
-describe('api-server', function() {
+describe('server-api-crud', function() {
   
   it('should get models', function() {
     
     var models = api.getModels();
     
     expect(Object.keys(models)).toEqual([
-      'markdown', 'posts', 'site'
+      'markdown', 'posts', 'site', 'somedata'
     ]);
     
   });
-  
-  /*
-  it('should know endpoints', function(done) {
-    
-    var endpoints = api.getEndpoints(function(eps) {
-      console.log(eps);
-      done();
-    });
-    
-  });*/
   
   it('should parse request url', function() {
     

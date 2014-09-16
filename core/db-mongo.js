@@ -9,35 +9,48 @@ var Mongo = require('mongodb')
   , connected
   , connecting
 
+  , pseudoPromiseChain = function(retVal) {
+      return {
+        then: function(cb) {
+          var ret = cb(retVal);
+          return pseudoPromiseChain(ret);
+        },
+        catch: function() {}
+      };
+    }
+
+  , interface = function(cli) {
+      return {
+        cli:    cli,
+        close:  function() {
+          console.log('- Closing mongo connection');
+          cli.close();
+          connected = false;
+          require('./models').setVar('mongo', false);
+        }
+      };
+    }
+
   , adapter = function(config) {
 
       if(!config || !config.connection)
         config = { connection: { host: 'localhost', port: 27017 } };
     
-      if(connecting) return connecting;
+      if(connecting && !connected) return connecting;
     
       // hold a reference handle so we only connect once
-      if(connected) return { then: function(cb) { cb(connected); return { catch: function() {} }; } };
+      if(connected) return pseudoPromiseChain(connected);
 
       // otherwise return an actual promise
       connecting = new Promise(function(yes,no) {
         console.log('- Opening mongo connection ', config.connection.host+':'+config.connection.port);
         var cli = new Client(new Server(config.connection.host, config.connection.port), { native_parser: true });
-        connected = cli;
         cli.open(function(err,cli) {
           if(err) return no(err);
-          connecting = false;
-          connected = cli;
+          connected = interface(cli);
           require('./models').setVar('mongo', true);
-          yes({
-            cli:    cli,
-            close:  function() {
-              console.log('- Closing mongo connection');
-              cli.close();
-              connected = false;
-              require('./models').setVar('mongo', false);
-            }
-          });
+          yes(connected);
+          connecting = false;
         });
       });
     
@@ -67,7 +80,7 @@ module.exports = {
   resourceHandlers: function(m) {
 
     return adapter(m).then(function(conn) {
-
+      
       var cli = conn.cli
         , db = cli.db(m.dbName || 'pubhook')
         , collection = db.collection(m.collection);

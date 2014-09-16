@@ -16,7 +16,7 @@ var Cli = require('simpcli')
         var args = this.parseFlags(arguments)
           , port = 8181;
           
-        require('../core/static-server.js')(args.p || port);
+        require('../core/server.js')(args.p || port);
       }
     },
     

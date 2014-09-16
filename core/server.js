@@ -1,6 +1,6 @@
 var connect = require('connect')
-  , tools = require('./server-tools')
-  , apiMiddleware = require('./api-server').middleware()
+  , tools = require('./tools/server-tools')
+  , apiMiddleware = require('./server-api').middleware()
   , staticMiddleware = require('serve-static')
   , _ = require('lodash')
   , fs = require('fs');

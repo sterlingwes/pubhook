@@ -7,7 +7,8 @@ describe('model fetcher', function() {
     expect(fetcher.types).toEqual({
       markdown:   'fs',
       mongo:      'db',
-      mongodb:    'db'
+      mongodb:    'db',
+      json:       'fs'
     });
   });
   
