@@ -14,3 +14,6 @@ public/
 
 # Don't include our built css (assuming we're not writing css files directly)
 assets/**/*.css
+
+# No hidden directories (like apps/_ph)
+**/_*

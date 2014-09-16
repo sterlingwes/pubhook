@@ -70,7 +70,7 @@ module.exports = function(folders, models, data/* models */, isWatching) {
     gulp.task('webpack', function() {
       console.log('- bundling apps');
       var wpConfig = require('./webpack-defaults');
-      return gulp.src(paths.apps + '/**/entry.js')
+      return gulp.src([ paths.apps + '/**/entry.js', '!'+paths.apps + '/_*/entry.js' ])
         .pipe(plumr({ errorHandler: onError }))
         .pipe(webpack(wpConfig, null/* webpack override */, function(err, stats) {
           if(err) console.log('- webpack err: ' + err);
@@ -80,7 +80,7 @@ module.exports = function(folders, models, data/* models */, isWatching) {
               , name = stats.modules[0].name.split('/');
             name = name[2];
             models.setVar('app:link:'+name, hash);
-            console.log('-- built '+ name);
+            console.log('-- built '+ name || stats.modules[0].name);
           }
         }))
         .pipe(gulp.dest(paths.buildApps));

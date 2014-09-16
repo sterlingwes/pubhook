@@ -29,6 +29,7 @@ Here we'll list progress towards 1.0.
 *   _0.3.0_ Support for hierarchy for fs-based models & model specific templates
 *   _0.3.2_ Server side rendering of Reactjs components
 *   _0.3.3_ User-defined api endpoints
+*   _0.3.5_ SPA / client-side app api reflection
 
 ## Usage
 

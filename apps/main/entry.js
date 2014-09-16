@@ -1,7 +1,11 @@
-require('script!zepto/zepto');
+var api = require('../_ph/api');
 
-$(document).ready(function() {
-  $('#menuLink').on('click', function() {
-    $('#layout, #menuLink, #menu').toggleClass('active');
-  });
+api
+.hello
+.world()
+.success(function(res) {
+  console.log(res);
+})
+.error(function(err) {
+  console.error(err);
 });

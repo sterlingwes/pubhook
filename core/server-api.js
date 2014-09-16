@@ -13,6 +13,8 @@ var _ = require('lodash')
 
 userApis.get().then(function(a) {
   apis = a;
+}).catch(function(e) {
+  console.error(e.stack);
 });
 
 module.exports = {

@@ -14,6 +14,7 @@ describe('server-api-defined', function() {
     userApis.get().then(function(apis) {
       
       // hello GET: /world
+      // api hash, apiName, method, resource
       testEp(apis,'hello','get','/world');
       
       done();

@@ -9,15 +9,7 @@ var Mongo = require('mongodb')
   , connected
   , connecting
 
-  , pseudoPromiseChain = function(retVal) {
-      return {
-        then: function(cb) {
-          var ret = cb(retVal);
-          return pseudoPromiseChain(ret);
-        },
-        catch: function() {}
-      };
-    }
+  , pseudoPromiseChain = require('./tools/pseudo-promise')
 
   , interface = function(cli) {
       return {

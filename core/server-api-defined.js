@@ -2,6 +2,9 @@ var Promise = require('es6-promise').Promise
   , _ = require('lodash')
   , glob = require('glob')
   , cwd = process.cwd()
+  , pseudoPromiseChain = require('./tools/pseudo-promise')
+
+  , fetchedEndpoints
 ;
 
 /*
@@ -60,6 +63,9 @@ var getDeps = function(func) {
  */
 var getApis = function() {
   
+  // don't re-fetch...
+  if(fetchedEndpoints) pseudoPromiseChain(fetchedEndpoints);
+  
   var apisDefined = glob.sync(cwd + '/apis/*.js')
     , promises = []
   ;
@@ -95,6 +101,11 @@ var getApis = function() {
       // pair is first apiName, then 'routes' from RouteHelper
       eps[pair[0]] = pair[1];
     });
+    fetchedEndpoints = eps;
+    
+    // write helper script
+    require('./server-reflector')(eps,null,require('./tools/ajax')());
+    
     return eps;
   });
 };
