@@ -21,6 +21,8 @@ module.exports = function(models, test) {
     glob(modelPath + '/*.js', function(err,files) {
       if(files) {
         files.forEach(function(f) {
+          if(f[0]=='_') return;
+          
           var modelName = f.replace(modelPath+'/','').replace(/\.js/,'')
             , promise = new Promise(function(res,rej) {
 

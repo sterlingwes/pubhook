@@ -1,5 +1,7 @@
 var _ = require('lodash')
-  , renderer = require('./server-renderer');
+  , renderer = require('./server-renderer')
+  , marked = require('marked')
+;
 
 /*
  * template functions
@@ -153,6 +155,18 @@ module.exports = function(sitemap) {
          var rec = getById(name, c);
          return rec;
        });
+     },
+     
+     /*
+      * markdown
+      * 
+      * convert markdown inline
+      * 
+      * @param {String} md
+      * @param {String} html
+      */
+     markdown: function(md) {
+       return marked(md);
      }
 
    };

@@ -11,6 +11,13 @@ module.exports = {
    */
   jsonHandler: function(req,res,next) {
     res.toJson = function(err,data) {
+      
+      if(typeof data === 'string') {
+        try {
+          data = JSON.parse(data);
+        } catch(e) {} // soft fail, assume it should be a string
+      }
+      
       var payload = {
         count:    _.isArray(data) ? data.length : 1,
         payload:  data

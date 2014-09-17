@@ -22,7 +22,7 @@ var gulp = require('gulp')
   , stringSrc = require('./tasks-stringSrc')
 
   , typeWhitelist = [
-    'css','js','png','jpg','jpeg','gif','webapp','txt','ico','html','woff2','woff','ttf','svg','eot'
+    'css','js','png','jpg','jpeg','gif','webapp','txt','ico','html','woff2','woff','ttf','svg','eot','pdf'
   ]
   
   , paths = {
@@ -48,7 +48,10 @@ module.exports = function(folders, models, data/* models */, isWatching) {
   var runCount = 0
     , hasApps = folders.indexOf('apps')!==-1
     , hasPages = folders.indexOf('pages')!==-1
-    , hasMd = folders.indexOf('markdown')!==-1
+    , hasMd = _.filter(data, function(d) {
+        // we only want those with specified uri schemes that aren't markdown (done by directory structure) or static models
+        return d && d.pubhookType == 'markdown' && (d.items && d.items.length);
+      })
     , hasAssets = folders.indexOf('assets')!==-1
     , isRenderable = _.filter(data, function(d) {
         // we only want those with specified uri schemes that aren't markdown (done by directory structure) or static models
@@ -131,7 +134,7 @@ module.exports = function(folders, models, data/* models */, isWatching) {
   if(hasMd) {
     gulp.task('renderMarkdown', function() {
       console.log('- renderMarkdown');
-      return stringSrc(data.markdown.items)
+      return stringSrc(_.flatten(_.pluck(hasMd,'items')))
         .pipe(plumr({ errorHandler: onError }))
         .pipe(streamdata(models.data))
         .pipe(swig())
