@@ -40,13 +40,12 @@ var gulp = require('gulp')
   }
 ;
 
-module.exports = function(folders, models, data/* models */, isWatching) {
+module.exports = function(folders, models, data/* models */, isWatching, hasApps) {
   
   /*
    * Single task definitions
    */
   var runCount = 0
-    , hasApps = folders.indexOf('apps')!==-1
     , hasPages = folders.indexOf('pages')!==-1
     , hasMd = _.filter(data, function(d) {
         // we only want those with specified uri schemes that aren't markdown (done by directory structure) or static models
@@ -69,7 +68,7 @@ module.exports = function(folders, models, data/* models */, isWatching) {
   });
   
   // build any webpack apps
-  if(hasApps) {
+  if(hasApps.length) {
     gulp.task('webpack', function() {
       console.log('- bundling apps');
       var wpConfig = require('./webpack-defaults');
@@ -131,7 +130,7 @@ module.exports = function(folders, models, data/* models */, isWatching) {
   }
   
   // render from /markdown if it exists
-  if(hasMd) {
+  if(hasMd.length) {
     gulp.task('renderMarkdown', function() {
       console.log('- renderMarkdown');
       return stringSrc(_.flatten(_.pluck(hasMd,'items')))
@@ -209,9 +208,9 @@ module.exports = function(folders, models, data/* models */, isWatching) {
       , render = []
       , pipe = ['publishDest'];
     
-    if(hasApps) preRender.push('webpack');
+    if(hasApps.length) preRender.push('webpack');
     if(hasPages) render.push('renderPages');
-    if(hasMd) render.push('renderMarkdown');
+    if(hasMd.length) render.push('renderMarkdown');
     if(isRenderable) render.push('renderRenderable');
     
     order.push(preRender);
