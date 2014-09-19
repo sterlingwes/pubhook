@@ -2,12 +2,15 @@ var connect = require('connect')
   , tools = require('./tools/server-tools')
   , apiMiddleware = require('./server-api').middleware()
   , staticMiddleware = require('serve-static')
+  , bodyParser = require('body-parser')
   , _ = require('lodash')
   , fs = require('fs');
   
 module.exports = function(port) {
   var server = connect()
     , publicFolder = process.cwd() + '/public';
+  
+  server.use(bodyParser.json());
   
   // add an api render handler to response object
   server.use('/api', tools.jsonHandler);

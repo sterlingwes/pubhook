@@ -29,7 +29,6 @@ function Ajax(window) {
     var XHR = window.XMLHttpRequest || ActiveXObject;
     var request = new XHR('MSXML2.XMLHTTP.3.0');
     request.open(type, url, true);
-    request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
     request.onreadystatechange = function () {
       if (request.readyState === 4) {
         if (request.status >= 200 && request.status < 300) {
@@ -39,6 +38,16 @@ function Ajax(window) {
         }
       }
     };
+    if(typeof data === 'object') {
+      try {
+        data = JSON.stringify(data);
+        request.setRequestHeader('Content-type', 'application/json');
+      } catch(e) {
+        console.error('Ajax: object payload could not be JSON.stringified')
+      }
+    } else
+      request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+    
     request.send(data);
     var callbacks = {
       success: function (callback) {

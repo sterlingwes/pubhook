@@ -57,7 +57,7 @@ module.exports = function(eps,done,xhr) {
         if(resName[0]=='/') resName = resName.slice(1);
         
         // TODO: need to handle params in resName starting with RouteHelper in server-api-defined
-        endpointName = resName.split('/').shift();
+        var endpointName = resName.split('/').shift();
         
         // this function can be called as the root request if there's only one method for the resource endpoint, otherwise it defaults to GET
         // ie: client.users()
