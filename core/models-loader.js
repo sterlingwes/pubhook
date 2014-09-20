@@ -1,6 +1,6 @@
-module.exports = function(models, test) {
+module.exports = function(models, folders) {
   
-  var glob = test ? test.glob : require('glob')
+  var glob = require('glob')
     , Promise = require('es6-promise').Promise
     , cwd = process.cwd()
     , modelPath = './models'
@@ -14,47 +14,53 @@ module.exports = function(models, test) {
    */
   var loader = function(done) {
     if(!done || typeof done !== 'function') done = function() {};
-    if(Object.keys(models).length) return done(null,models);
+    if(folders.length)
+      return done(null,models,folders);
 
     var promises = [];
 
-    glob(modelPath + '/*.js', function(err,files) {
-      if(files) {
-        files.forEach(function(f) {
-          if(f[0]=='_') return;
-          
-          var modelName = f.replace(modelPath+'/','').replace(/\.js/,'')
-            , promise = new Promise(function(res,rej) {
+    console.log('- Loading models & fs...');
+    
+    glob(cwd+'/*', function(err,fldrs) {
+      folders = fldrs;
+      glob(modelPath + '/*.js', function(err,files) {
+        if(files) {
+          files.forEach(function(f) {
+            if(f[0]=='_') return;
 
-              try {
-                fetchModel(modelName, require(f.replace(/^\.+/, cwd)), function(err,m) {
-                  if(err) return console.warn(err);
-                  if(m) { models[modelName] = m; }
-                  res(models[modelName]);
-                });
+            var modelName = f.replace(modelPath+'/','').replace(/\.js/,'')
+              , promise = new Promise(function(res,rej) {
 
-              } catch(e) {
-                console.warn('! Err Loading Model "'+modelName+'" ');
-                console.log(e.stack);
-                rej(e);
-              }
+                try {
+                  fetchModel(modelName, require(f.replace(/^\.+/, cwd)), function(err,m) {
+                    if(err) return console.warn(err);
+                    if(m) { models[modelName] = m; }
+                    res(models[modelName]);
+                  });
 
-            })
-          ;
+                } catch(e) {
+                  console.warn('! Err Loading Model "'+modelName+'" ');
+                  console.log(e.stack);
+                  rej(e);
+                }
 
-          promises.push(promise);
-        });
+              })
+            ;
 
-        Promise.all(promises).then(function() {
-          var mods = Object.keys(models);
-          console.log('- '+ mods.length+' models loaded: '+mods.join(', '));
-          done(null,models);
+            promises.push(promise);
+          });
 
-        }).catch(function(err) {
-          console.warn('! Error loading models');
-          console.log(err.stack);
-        });
-      }
+          Promise.all(promises).then(function() {
+            var mods = Object.keys(models);
+            console.log('- '+ mods.length+' models loaded: '+mods.join(', '));
+            done(null,models,fldrs);
+
+          }).catch(function(err) {
+            console.warn('! Error loading models');
+            console.log(err.stack);
+          });
+        }
+      });
     });
   };
 

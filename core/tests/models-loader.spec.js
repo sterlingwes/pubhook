@@ -1,12 +1,10 @@
 var cwd = process.cwd();
 
-if(!/tests$/.test(cwd)) cwd += '/tests';
-
 describe('model loader', function() {
   
   it('should load all model records', function(done) {
     
-    var loader = require('../models-loader')({});
+    var loader = require('../models-loader')({},[]);
     
     loader(function(err,data) {
       

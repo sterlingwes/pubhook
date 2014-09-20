@@ -2,6 +2,7 @@ var sitemap = require('./models-sitemap')
   , Functions = require('./tplfuncs')(sitemap)
   , _ = require('lodash')
   , models = {}
+  , folders = {}
   , vars = {}
 ;
 
@@ -50,7 +51,7 @@ module.exports = {
   /*
    * loader - handles making any database connections and fetching data
    */
-  load: require('./models-loader')(models),
+  load: require('./models-loader')(models,folders),
   
   /*
    * get - provides for retrieval of a model
