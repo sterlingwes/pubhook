@@ -42,10 +42,17 @@ if(GLOBAL.taskToRun) {
   
   var tfn = setupTask(taskPath);
   console.log('- Running task: '+ task);
-  if(!tfn || typeof tfn !== 'function')
+  if(!tfn || (typeof tfn !== 'function' && !Array.isArray(tfn)))
     console.error('! Failed to setup task '+ task);
   
-  gulp.task(task, tfn);
+  if(Array.isArray(tfn)) {
+    if(typeof tfn[0] !== 'string') tfn.unshift(task);
+    else task = tfn[0];
+    gulp.task.apply(gulp, tfn);
+  }
+  else
+    gulp.task(task, tfn);
+  
   gulp.start(task, function(err) {
     console.log('- done task', err ? (err.stack || err) : '');
     if(err && err.err) console.log(err.err.stack);
@@ -60,9 +67,15 @@ else {
   .then(function(tfns) {
 
     tfns.forEach(function(fn,i) {
-      if(!fn || typeof fn !== 'function') return;
-      //console.log('- setting up ', tasksRegistered[i], ' gulp task');
-      gulp.task(tasksRegistered[i], fn);
+      if(!fn || (typeof fn !== 'function' && !Array.isArray(fn)))
+        return console.warn('! Skipped task ', tasksRegistered[i], 'invalid');
+
+      if(Array.isArray(fn)) {
+        if(typeof fn[0] !== 'string') fn.unshift(tasksRegistered[i]);
+        gulp.task.apply(gulp, fn);
+      }
+      else
+        gulp.task(tasksRegistered[i], fn);
       availableTasks.push(tasksRegistered[i]);
     });
 

@@ -7,6 +7,7 @@ var _ = require('lodash')
   , glob = require('glob')
   , cwd = process.cwd()
   , userApis = require('./server-api-defined')
+  , crudApis = require('./server-api-crud')
   
   , apis
 ;
@@ -54,8 +55,8 @@ module.exports = {
       });
       
       if(!ep || typeof ep.handler !== 'function')
-        return next();
-      
+        return crudApis.middleware(req,res,next); // try default crud apis
+
       ep.handler(req,res,next);
       
     };

@@ -2,6 +2,7 @@ var glob = require('glob')
   , _ = require('lodash')
   , url = require('url')
   , cwd = process.cwd()
+  , triggerBuild = require('./tasks-trigger')
 
   , models
 ;
@@ -86,7 +87,13 @@ var middleware = function(req,res,next) {
               if(!actions.read) { console.warn('! No read() action for '+resource.pubhookType); return next(); }
               return actions.read(res.toJson);
             case "POST":
-              return actions.create(req.body, res.toJson);
+              return actions.create(req.body, function(err,docs) {
+                if(!err) {
+                  // force build for this scope
+                  triggerBuild(path.resource, docs);
+                }
+                res.toJson(err,docs);
+              });
         }
 
       });
