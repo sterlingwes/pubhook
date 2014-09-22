@@ -1,13 +1,14 @@
 var gulp = require('gulp')
   , changed = require('gulp-changed')
+  , cwd = process.cwd()
 ;
 
-module.exports = function(folders, models) {
+module.exports = function() {
   
   return function() {
-    return gulp.src('/.build/**/*')
-      .pipe(changed('/public'))
-      .pipe(gulp.dest('/public'));
+    return gulp.src(cwd + '/.build/**/*')
+      .pipe(changed(cwd + '/public'))
+      .pipe(gulp.dest(cwd + '/public'));
   };
   
 };

@@ -1,14 +1,15 @@
 var gulp = require('gulp')
   , sass = require('gulp-sass')
+  , cwd = process.cwd()
 ;
 
-module.exports = function(folders, models) {
+module.exports = function() {
   
   return function() {
     console.log('- compiling sass');
-    return gulp.src('/assets/**/*.scss')
+    return gulp.src(cwd + '/assets/**/*.scss')
       .pipe(sass())
-      .pipe(gulp.dest('/assets'));
+      .pipe(gulp.dest(cwd + '/assets'));
   };
   
 };

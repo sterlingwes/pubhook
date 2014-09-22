@@ -1,4 +1,4 @@
-module.exports = function(models, folders) {
+module.exports = function(models,folders) {
   
   var glob = require('glob')
     , Promise = require('es6-promise').Promise
@@ -22,7 +22,9 @@ module.exports = function(models, folders) {
     console.log('- Loading models & fs...');
     
     glob(cwd+'/*', function(err,fldrs) {
-      folders = fldrs;
+      folders = fldrs.map(function(f) {
+        return f.split('/').pop();
+      });
       glob(modelPath + '/*.js', function(err,files) {
         if(files) {
           files.forEach(function(f) {
@@ -53,7 +55,7 @@ module.exports = function(models, folders) {
           Promise.all(promises).then(function() {
             var mods = Object.keys(models);
             console.log('- '+ mods.length+' models loaded: '+mods.join(', '));
-            done(null,models,fldrs);
+            done(null,models,folders);
 
           }).catch(function(err) {
             console.warn('! Error loading models');

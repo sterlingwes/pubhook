@@ -1,4 +1,6 @@
-var gulp = require('gulp')
+var models = require('./models')
+  , Promise = require('es6-promise').Promise
+  , gulp = require('gulp')
   , glob = require('glob')
   , fs = require('fs')
   , sequence = require('run-sequence')
@@ -10,29 +12,54 @@ var gulp = require('gulp')
   , cwd = process.cwd()
 ;
 
-module.exports = function(folders, models, isWatching) {
+/*
+ * Setup tasks
+ */
+var tasks = glob.sync(cwd + '/core/tasks/*.js')
+  , taskChain = []
+  , tasksRegistered = []
+  , availableTasks = [];
+
+tasks.forEach(function(tFileName) {
+  var tr;
+  try {
+    tr = require(tFileName);
+    if(tr && typeof tr === 'function')
+      tr = tr();
+    
+    taskChain.push(tr);
+    var taskName = tFileName.split('/').pop().replace(/\.js$/,'');
+    tasksRegistered.push(taskName);
+    
+  } catch(e) { console.error('! Failed to load '+tFileName, e.stack); }
+});
+
+Promise.all(taskChain)
+.then(function(tfns) {
   
-  /*
-   * Setup tasks
-   */
-  var tasks = glob.sync(cwd + '/tasks/*.js')
-    , tasksRegistered = [];
-  
-  tasks.forEach(function(t) {
-    var tr;
-    try {
-      t = require(t);
-    } catch(e) { console.error('! Failed to load '+t, e.stack); }
-    if(t) tasksRegistered.push(t.replace(cwd+'/','').replace(/\.js$/,''));
+  tfns.forEach(function(fn,i) {
+    if(!fn || typeof fn !== 'function') return;
+    //console.log('- setting up ', tasksRegistered[i], ' gulp task');
+    gulp.task(tasksRegistered[i], fn);
+    availableTasks.push(tasksRegistered[i]);
   });
   
-  /*
-   * Single task definitions
-   */
-  var runCount = 0;
+  setup();
   
+})
+.catch(function(err) {
+  console.error(err.stack);
+});
+
+/*
+ * Single task definitions
+ */
+var runCount = 0;
+
+function setup() {
+ 
   // check if we need to watch
-  if(isWatching) {
+  if(GLOBAL.isWatching) {
     gulp.task('watch', function() {
       livereload.listen(35729);
       gulp.watch('/assets/**/*.less', ['watch-less']);
@@ -40,7 +67,7 @@ module.exports = function(folders, models, isWatching) {
       gulp.watch('/public/**/*').on('change', livereload.changed);
     });
   }
-  
+
   /*
    * Task sequencing / grouping definition
    *
@@ -56,42 +83,42 @@ module.exports = function(folders, models, isWatching) {
       , preRender = ['clean','less','sass']
       , render = []
       , pipe = ['publish'];
-    
-    if(_.contains(tasksRegistered,'webpack'))   preRender.push('webpack');
-    if(_.contains(tasksRegistered,'pages'))     render.push('renderPages');
-    if(_.contains(tasksRegistered,'markdown'))  render.push('renderMarkdown');
-    if(_.contains(tasksRegistered,'db'))        render.push('renderRenderable');
-    
+
+    if(_.contains(availableTasks,'webpack'))   preRender.push('webpack');
+    if(_.contains(availableTasks,'pages'))     render.push('pages');
+    if(_.contains(availableTasks,'markdown'))  render.push('markdown');
+    if(_.contains(availableTasks,'db'))        render.push('db');
+
     order.push(preRender);
     if(render.length) order.push(render);
     pipe.push('assets');
     order.push(pipe);
-    if(isWatching) order.push('watch');
-    
+    if(GLOBAL.isWatching) order.push('watch');
+
     order.push(cb);
-    
+
     sequence.apply(sequence, order);
   });
-  
+
   /*
    * watch-less task
    */
   gulp.task('watch-less', function(cb) {
     sequence('less', 'assets', cb);
   });
-  
+
   /*
    * watch-templates task
    */
   gulp.task('watch-templates', function(cb) {
     sequence(['pages', 'markdown', 'db'], 'publish', cb);
   });
-  
+
   // in lieu of calling gulp from the command line...
   gulp.start('build', function(err) {
     if(!runCount) {
       console.log('- done tasks', err ? (err.stack || err) : '');
-      if(isWatching) console.log('  ... and watching for changes');
+      if(GLOBAL.isWatching) console.log('  ... and watching for changes');
       else models.closeDbs();
       var smap = JSON.stringify(sitemap.get(), null, ' ');
       fs.writeFile(cwd + '/sitemapping.json', smap, function(err) {
@@ -101,4 +128,4 @@ module.exports = function(folders, models, isWatching) {
     runCount++;
   });
   
-};
+}

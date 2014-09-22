@@ -1,10 +1,12 @@
-var del = require('rimraf');
+var del = require('rimraf')
+  , cwd = process.cwd()
+;
 
 module.exports = function() {
   
   return function() {
     console.log('- Cleaning up old build files');
-    del('/.build', function() {});
+    del(cwd + '/.build', function() {});
   };
   
 };

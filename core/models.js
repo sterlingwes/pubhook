@@ -4,6 +4,8 @@ var sitemap = require('./models-sitemap')
   , models = {}
   , folders = {}
   , vars = {}
+  , isLoading = false
+  , loadingQueue = []
 ;
 
 var getter = function(modelName) {
@@ -51,7 +53,22 @@ module.exports = {
   /*
    * loader - handles making any database connections and fetching data
    */
-  load: require('./models-loader')(models,folders),
+  load: function(done) {
+    if(folders.length) return done(err,models,folders);
+    if(!isLoading) {
+      isLoading = true;
+      require('./models-loader')(models,folders)(function(err,ms,fs) {
+        models = ms;
+        folders = fs;
+        isLoading = false;
+        done(err,ms,fs);
+        loadingQueue.forEach(function(qcb) {
+          qcb(err,ms,fs);
+        });
+      });
+    }
+    else loadingQueue.push(done);
+  },
   
   /*
    * get - provides for retrieval of a model
