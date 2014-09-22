@@ -32,7 +32,6 @@ module.exports = function(cb) {
       .pipe(swig())
       .pipe(gulp.dest(cwd + '/.build'));
 
-    console.log('pages done');
     cb();
   });
   

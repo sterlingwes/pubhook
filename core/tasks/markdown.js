@@ -30,7 +30,6 @@ module.exports = function(cb) {
       }))
       .pipe(gulp.dest(cwd + '/.build'));
 
-    console.log('md done');
     cb();
 
   });

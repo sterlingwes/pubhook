@@ -1,17 +1,29 @@
 #! /usr/bin/env node
 var Cli = require('simpcli')
+  , cwd = process.cwd()
+  , availableTasks = require('glob').sync(cwd + '/core/tasks/*.js')
   , cli = new Cli({
 
     start: {
       about: 'Build & render your site to the public folder (-w to watch)',
       fn: function() {
         console.log('- Starting build...');
-        require('../core/main.js')( this.parseFlags(arguments) );
+        require('../core/main')( this.parseFlags(arguments) );
+      }
+    },
+    
+    task: {
+      about: 'Run a specific task ('
+            + availableTasks.map(function(t) { return t.split('/').pop().replace(/\.js$/,''); })
+              .join(', ') + ')',
+      fn: function(task) {
+        GLOBAL.taskToRun = task;
+        require('../core/tasks');
       }
     },
     
     serve: {
-      about: 'Start a simple static HTTP file server for development, -p port',
+      about: 'Start a dev server, -p port',
       fn: function() {
         var args = this.parseFlags(arguments)
           , port = 8181;

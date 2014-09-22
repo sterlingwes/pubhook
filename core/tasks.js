@@ -9,7 +9,7 @@ var models = require('./models')
   
   , sitemap = require('./models-sitemap')
 
-  , cwd = process.cwd()
+  , cwd = process.cwd().replace(/\\/g,'/')
 ;
 
 /*
@@ -20,43 +20,88 @@ var tasks = glob.sync(cwd + '/core/tasks/*.js')
   , tasksRegistered = []
   , availableTasks = [];
 
-tasks.forEach(function(tFileName) {
+function setupTask(tFileName) {
   var tr;
   try {
     tr = require(tFileName);
     taskChain.push(tr);
     var taskName = tFileName.split('/').pop().replace(/\.js$/,'');
     tasksRegistered.push(taskName);
-    
-  } catch(e) { console.error('! Failed to load '+tFileName, e.stack); }
-});
 
-Promise.all(taskChain)
-.then(function(tfns) {
+  } catch(e) { console.error('! Failed to load '+tFileName, e.stack); }
+  return tr;
+}
+
+// run a specific task
+if(GLOBAL.taskToRun) {
+  var task = GLOBAL.taskToRun
+    , taskPath = cwd + '/core/tasks/' + GLOBAL.taskToRun + '.js';
+
+  if(tasks.indexOf(taskPath)==-1)
+    return console.error('! No task registered by that name: '+ GLOBAL.taskToRun);
   
-  tfns.forEach(function(fn,i) {
-    if(!fn || typeof fn !== 'function') return;
-    //console.log('- setting up ', tasksRegistered[i], ' gulp task');
-    gulp.task(tasksRegistered[i], fn);
-    availableTasks.push(tasksRegistered[i]);
+  var tfn = setupTask(taskPath);
+  console.log('- Running task: '+ task);
+  if(!tfn || typeof tfn !== 'function')
+    console.error('! Failed to setup task '+ task);
+  
+  gulp.task(task, tfn);
+  gulp.start(task, function(err) {
+    console.log('- done task', err ? (err.stack || err) : '');
+    if(err && err.err) console.log(err.err.stack);
+    models.closeDbs();
   });
-  
-  setup();
-  
-})
-.catch(function(err) {
-  console.error(err.stack);
-});
+}
+// if no specific task needs to be run, we're doing a default build
+else {
+  tasks.forEach(setupTask);
+
+  Promise.all(taskChain)
+  .then(function(tfns) {
+
+    tfns.forEach(function(fn,i) {
+      if(!fn || typeof fn !== 'function') return;
+      //console.log('- setting up ', tasksRegistered[i], ' gulp task');
+      gulp.task(tasksRegistered[i], fn);
+      availableTasks.push(tasksRegistered[i]);
+    });
+
+    run();
+
+  })
+  .catch(function(err) {
+    console.error(err.stack);
+  });
+
+}
 
 /*
  * Single task definitions
  */
 var runCount = 0;
 
-function setup() {
- 
+/*
+ * run is called above if we're not running a specific task
+ * akin to just "$ gulp" or running a default task
+ */
+function run() {
+
   // check if we need to watch
   if(GLOBAL.isWatching) {
+    /*
+     * watch-less task
+     */
+    gulp.task('watch-less', function(cb) {
+      sequence('less', 'assets', cb);
+    });
+
+    /*
+     * watch-templates task
+     */
+    gulp.task('watch-templates', function(cb) {
+      sequence(['pages', 'markdown', 'db'], 'publish', cb);
+    });
+
     gulp.task('watch', function() {
       livereload.listen(35729);
       gulp.watch('/assets/**/*.less', ['watch-less']);
@@ -97,20 +142,6 @@ function setup() {
     sequence.apply(sequence, order);
   });
   
-  /*
-   * watch-less task
-   */
-  gulp.task('watch-less', function(cb) {
-    sequence('less', 'assets', cb);
-  });
-
-  /*
-   * watch-templates task
-   */
-  gulp.task('watch-templates', function(cb) {
-    sequence(['pages', 'markdown', 'db'], 'publish', cb);
-  });
-
   // in lieu of calling gulp from the command line...
   gulp.start('build', function(err) {
     if(!runCount) {
