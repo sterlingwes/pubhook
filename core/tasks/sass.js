@@ -5,11 +5,9 @@ var gulp = require('gulp')
 
 module.exports = function() {
   
-  return function() {
-    console.log('- compiling sass');
-    return gulp.src(cwd + '/assets/**/*.scss')
-      .pipe(sass())
-      .pipe(gulp.dest(cwd + '/assets'));
-  };
+  console.log('- compiling sass');
+  return gulp.src(cwd + '/assets/**/*.scss')
+    .pipe(sass())
+    .pipe(gulp.dest(cwd + '/assets'));
   
 };

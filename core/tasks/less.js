@@ -5,11 +5,9 @@ var gulp = require('gulp')
 
 module.exports = function() {
   
-  return function() {
-    console.log('- compiling less');
-    return gulp.src(cwd + '/assets/**/*.less')
-      .pipe(less())
-      .pipe(gulp.dest(cwd + '/assets'));
-  };
+  console.log('- compiling less');
+  return gulp.src(cwd + '/assets/**/*.less')
+    .pipe(less())
+    .pipe(gulp.dest(cwd + '/assets'));
   
 };

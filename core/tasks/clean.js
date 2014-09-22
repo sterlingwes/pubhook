@@ -4,9 +4,7 @@ var del = require('rimraf')
 
 module.exports = function() {
   
-  return function() {
-    console.log('- Cleaning up old build files');
-    del(cwd + '/.build', function() {});
-  };
+  console.log('- Cleaning up old build files');
+  return del(cwd + '/.build', function() {});
   
 };

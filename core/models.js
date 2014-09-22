@@ -54,7 +54,7 @@ module.exports = {
    * loader - handles making any database connections and fetching data
    */
   load: function(done) {
-    if(folders.length) return done(err,models,folders);
+    if(folders.length) return done(null,models,folders);
     if(!isLoading) {
       isLoading = true;
       require('./models-loader')(models,folders)(function(err,ms,fs) {

@@ -2,43 +2,38 @@ var gulp = require('gulp')
   , streamdata = require('gulp-data')
   , swig = require('gulp-swig')
   , models = require('../models')
-  , Promise = require('es6-promise').Promise
   , cwd = process.cwd()
   , _ = require('lodash')
 ;
 
-module.exports = function() {
-
-  return new Promise(function(yes,no) {
+module.exports = function(cb) {
     
-    models.load(function(err,data,folders) {
-    
-      var hasPages = folders.indexOf('pages')!==-1;
+  models.load(function(err,data,folders) {
 
-      if(!hasPages) return yes(false);
+    var hasPages = folders.indexOf('pages')!==-1;
 
-      yes(function() {
-        // get our sources
-        console.log('- renderPages');
+    if(!hasPages) return cb();
 
-        return gulp.src(cwd + '/pages/**/*.html')
-          .pipe(streamdata(function(file) {
-            var uri = file.path.replace(cwd,'').replace(/\\/g,'/').replace('/pages/','').replace(/\.html$/,'');
-            file.data = file.data || {};
-            if(uri=='index')
-              uri = '';
+    // get our sources
+    console.log('- renderPages');
 
-            // TODO: need to handle accounting for _children and _parent here as per markdown!
+    gulp.src(cwd + '/pages/**/*.html')
+      .pipe(streamdata(function(file) {
+        var uri = file.path.replace(cwd,'').replace(/\\/g,'/').replace('/pages/','').replace(/\.html$/,'');
+        file.data = file.data || {};
+        if(uri=='index')
+          uri = '';
 
-            _.extend(file.data, { ctx: { __uri: uri }});
-            return models.data(file);
-          }))
-          .pipe(swig())
-          .pipe(gulp.dest(cwd + '/.build'));
-      });
+        // TODO: need to handle accounting for _children and _parent here as per markdown!
 
-    });
-    
+        _.extend(file.data, { ctx: { __uri: uri }});
+        return models.data(file);
+      }))
+      .pipe(swig())
+      .pipe(gulp.dest(cwd + '/.build'));
+
+    console.log('pages done');
+    cb();
   });
   
 };

@@ -24,9 +24,6 @@ tasks.forEach(function(tFileName) {
   var tr;
   try {
     tr = require(tFileName);
-    if(tr && typeof tr === 'function')
-      tr = tr();
-    
     taskChain.push(tr);
     var taskName = tFileName.split('/').pop().replace(/\.js$/,'');
     tasksRegistered.push(taskName);
@@ -99,7 +96,7 @@ function setup() {
 
     sequence.apply(sequence, order);
   });
-
+  
   /*
    * watch-less task
    */
@@ -118,6 +115,7 @@ function setup() {
   gulp.start('build', function(err) {
     if(!runCount) {
       console.log('- done tasks', err ? (err.stack || err) : '');
+      if(err && err.err) console.log(err.err.stack);
       if(GLOBAL.isWatching) console.log('  ... and watching for changes');
       else models.closeDbs();
       var smap = JSON.stringify(sitemap.get(), null, ' ');
