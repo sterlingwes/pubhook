@@ -53,12 +53,20 @@ module.exports = {
   
   /*
    * loader - handles making any database connections and fetching data
+   * 
+   * @param {Function} done callback passed from task file, signature and var naming matters
    */
   load: function(done) {
-    if(folderStructure.length) return done(null,models,folderStructure);
+    var cbDeps = getDeps(done);
+    if(folderStructure.length && Object.keys(models).length) {
+      // TODO: these checks seem pretty duplicative compared to models-loader logic, consolidate
+      if(cbDeps.length==3)
+        return done(null,models,folderStructure);
+      else return done(null,folderStructure);
+    }
+    
     if(!isLoading) {
       isLoading = true;
-      var cbDeps = getDeps(done);
       cbDeps.push(function() {
         var args = [].slice.call(arguments,0)
           , hasModels = args.length == 3
