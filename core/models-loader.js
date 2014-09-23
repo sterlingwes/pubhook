@@ -13,8 +13,15 @@ module.exports = function(models,folders) {
    * @param {Function} done - callback when promises resolve (err, modelDatas)
    */
   var loader = function(done) {
+    
+    var deps = ['data','folders'];
+    if(Array.isArray(done)) {
+      deps = done.slice(0,done.length-1);
+      done = done.pop();
+    }
+    
     if(!done || typeof done !== 'function') done = function() {};
-    if(folders.length)
+    if(folders.length && Object.keys(models).length)
       return done(null,models,folders);
 
     var promises = [];
@@ -25,6 +32,10 @@ module.exports = function(models,folders) {
       folders = fldrs.map(function(f) {
         return f.split('/').pop();
       });
+      
+      if(deps.indexOf('data')==-1)
+        return done(err,folders);
+      
       glob(modelPath + '/*.js', function(err,files) {
         if(files) {
           files.forEach(function(f) {

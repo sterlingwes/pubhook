@@ -6,7 +6,7 @@ var gulp = require('gulp')
 
 module.exports = function(cb) {
     
-  models.load(function(err,data,folders) {
+  models.load(function(err,folders) {
 
     var hasAssets = folders.indexOf('assets')!==-1
       , typeWhitelist = [

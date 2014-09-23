@@ -37,24 +37,6 @@ var RouteHelper = function(apiName) {
 });
 
 /*
- * getDeps
- * 
- * get function variable names    not currently used
- * 
- * @param {Function} func
- * @return {Array} of strings
- */
-var getDeps = function(func) {
-  if(typeof func !== 'function')	return [];
-    var fnStr = func.toString().replace(/((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg, '');
-    var result = fnStr.slice(fnStr.indexOf('(')+1, fnStr.indexOf(')')).match(/([^\s,]+)/g);
-    if(result === null)
-        result = [];
-
-    return _.map(result, function(dep) { return dep.toLowerCase(); });
-};
-
-/*
  * getApis
  * 
  * builds a hash of resources > methods > definitions (by depth)

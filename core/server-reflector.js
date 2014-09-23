@@ -86,6 +86,7 @@ module.exports = function(eps,done,xhr) {
       
     });
                 
+    retVal._xhr = xhr;
     return retVal;          
     
   }

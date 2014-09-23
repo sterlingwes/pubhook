@@ -2,10 +2,11 @@ var sitemap = require('./models-sitemap')
   , Functions = require('./tplfuncs')(sitemap)
   , _ = require('lodash')
   , models = {}
-  , folders = {}
+  , folderStructure = {}
   , vars = {}
   , isLoading = false
   , loadingQueue = []
+  , getDeps = require('./tools/func-deps')
 ;
 
 var getter = function(modelName) {
@@ -54,18 +55,34 @@ module.exports = {
    * loader - handles making any database connections and fetching data
    */
   load: function(done) {
-    if(folders.length) return done(null,models,folders);
+    if(folderStructure.length) return done(null,models,folderStructure);
     if(!isLoading) {
       isLoading = true;
-      require('./models-loader')(models,folders)(function(err,ms,fs) {
-        models = ms;
-        folders = fs;
+      var cbDeps = getDeps(done);
+      cbDeps.push(function() {
+        var args = [].slice.call(arguments,0)
+          , hasModels = args.length == 3
+          , err = args[0];
+        
         isLoading = false;
-        done(err,ms,fs);
+        if(hasModels) {
+          models = args[1];
+          folderStructure = args[2]
+          done(err, models, folderStructure);
+        }
+        else {
+          folderStructure = args[1];
+          done(err, folderStructure);
+        }
+        
         loadingQueue.forEach(function(qcb) {
-          qcb(err,ms,fs);
+          if(hasModels)
+            qcb(err,models,folders);
+          else
+            qcb(err,folders);
         });
       });
+      require('./models-loader')(models,folderStructure)(cbDeps);
     }
     else loadingQueue.push(done);
   },
