@@ -4,6 +4,7 @@ var Promise = require('es6-promise').Promise
   , cwd = process.cwd()
   , pseudoPromiseChain = require('./tools/pseudo-promise')
 
+  , HTTPmethods = ['get','post','head','post','put','delete','all']
   , fetchedEndpoints
 ;
 
@@ -17,9 +18,10 @@ var Promise = require('es6-promise').Promise
 var RouteHelper = function(apiName) {
   this.apiName = apiName;
   this.routes = {};
+  this.middleware = [];
 };
 
-['get','post','head','post','put','delete'].forEach(function(method) {
+HTTPmethods.forEach(function(method) {
   RouteHelper.prototype[method] = function(resource, handlerFn) {
     if(!resource || !handlerFn || typeof resource !== 'string' || typeof handlerFn !== 'function')
       return console.warn('! Invalid signature for api RouteHelper.'+method+'(resource, handlerFn) method call');
@@ -27,14 +29,31 @@ var RouteHelper = function(apiName) {
     if(resource[0]!=='/') resource = '/' + resource;
     
     var ep = this.routes[resource] = this.routes[resource] || {};
-    ep[method] = {
-      // TODO: should parse the resource for /:params like express, or allow regex
-      // TODO: should allow for middleware chaining akin to express.. ie: app.get route middleware middleware etc..
-      handler: handlerFn
-    };
+    if(method=='all') {
+      _.without(HTTPmethods,'all').forEach(function(method) {
+        ep[method] = {
+          // TODO: should parse the resource for /:params like express, or allow regex
+          // TODO: should allow for middleware chaining akin to express.. ie: app.get route middleware middleware etc..
+          handler: handlerFn
+        };
+      });
+    }
+    else {
+      ep[method] = {
+        // TODO: should parse the resource for /:params like express, or allow regex
+        // TODO: should allow for middleware chaining akin to express.. ie: app.get route middleware middleware etc..
+        handler: handlerFn
+      };
+    }
     
   };
 });
+
+RouteHelper.prototype.use = function(fn) {
+  if(typeof fn !== 'function')
+    return console.warn('! User-defined API middleware only takes a function, no mounting', fn);
+  this.middleware.push(fn);
+};
 
 /*
  * getApis
