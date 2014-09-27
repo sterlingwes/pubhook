@@ -7,6 +7,7 @@ sitemapping.json
 # Encourage npm install / bower install for inclusion
 node_modules/
 bower_components/
+npm-debug.log
 
 # No build or dist files
 public/

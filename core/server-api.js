@@ -33,13 +33,15 @@ module.exports = {
 
       var parsed = url.parse(req.url)
         , parts = parsed.pathname.split('/')
-        , path = [];
+        , path = []
+        , middlewareStack = []
+      ;
       
       parts.shift(); // get rid of /api namespace
       
       path.push(parts.shift()); // apiName
       path.push('/'+parts.join('/')); // resource & any ids or other parts
-      path.push.apply(path, [req.method.toLowerCase(), 'handler']); // method and handler
+      path.push.apply(path, [req.method.toLowerCase(), 'handlers']); // method and handler
       
       var level = apis[path.shift()]
         , ep;
@@ -54,7 +56,7 @@ module.exports = {
         level = level[part];
       });
       
-      if(!ep || typeof ep.handler !== 'function')
+      if(!ep || !ep.handlers || !ep.handlers.length)
         return crudApis.middleware(req,res,next); // try default crud apis
 
       ep.handler(req,res,next);

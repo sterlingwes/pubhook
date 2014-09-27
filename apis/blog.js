@@ -10,9 +10,9 @@ module.exports = function(app) {
   
   //Routes
   var routes = {};
-  routes.posts = require('./route/posts.js');
-  routes.users = require('./route/users.js');
-  routes.rss = require('./route/rss.js');
+  routes.posts = require('./blog/route/posts.js');
+  routes.users = require('./blog/route/users.js');
+  routes.rss = require('./blog/route/rss.js');
 
   app.all('*', function(req, res, next) {
     res.set('Access-Control-Allow-Origin', 'http://localhost');

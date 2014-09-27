@@ -22,9 +22,14 @@ var RouteHelper = function(apiName) {
 };
 
 HTTPmethods.forEach(function(method) {
-  RouteHelper.prototype[method] = function(resource, handlerFn) {
-    if(!resource || !handlerFn || typeof resource !== 'string' || typeof handlerFn !== 'function')
-      return console.warn('! Invalid signature for api RouteHelper.'+method+'(resource, handlerFn) method call');
+  RouteHelper.prototype[method] = function(resource) {
+    
+    var handlers = [].slice.call(arguments,1).filter(function(fn) {
+      return typeof fn === 'function';
+    });
+    
+    if(!resource || !handlers.length || typeof resource !== 'string')
+      return console.warn('! Invalid signature for api RouteHelper.'+method+'(resource, handlerFn, ...) method call');
     
     if(resource[0]!=='/') resource = '/' + resource;
     
@@ -34,7 +39,7 @@ HTTPmethods.forEach(function(method) {
         ep[method] = {
           // TODO: should parse the resource for /:params like express, or allow regex
           // TODO: should allow for middleware chaining akin to express.. ie: app.get route middleware middleware etc..
-          handler: handlerFn
+          handlers: handlers
         };
       });
     }
@@ -42,7 +47,7 @@ HTTPmethods.forEach(function(method) {
       ep[method] = {
         // TODO: should parse the resource for /:params like express, or allow regex
         // TODO: should allow for middleware chaining akin to express.. ie: app.get route middleware middleware etc..
-        handler: handlerFn
+        handlers: handlers
       };
     }
     

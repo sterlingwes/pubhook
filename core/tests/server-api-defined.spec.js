@@ -4,7 +4,7 @@ var testEp = function(apis,name,method,resource) {
   expect(apis[name]).toBeTruthy();
   expect(apis[name][resource]).toBeTruthy();
   expect(typeof apis[name][resource][method]).toBe('object');
-  expect(typeof apis[name][resource][method].handler).toBe('function');
+  expect('length' in apis[name][resource][method].handlers).toEqual(true);
 };
 
 describe('server-api-defined', function() {
