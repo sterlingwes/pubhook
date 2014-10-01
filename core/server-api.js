@@ -43,12 +43,12 @@ module.exports = {
       path.push('/'+parts.join('/')); // resource & any ids or other parts
       path.push.apply(path, [req.method.toLowerCase(), 'handlers']); // method and handler
       
-      var level = apis ? apis[path.shift()] : undefined
+      var level = apis && apis.endpoints ? apis.endpoints[path.shift()] : undefined
         , ep;
       
       _.find(path, function(part) {
         
-        if(!level || (typeof level[part] === 'function')) {
+        if(!level || level[part].length) {
           if(level) ep = level;
           return true;
         }
@@ -59,7 +59,7 @@ module.exports = {
       if(!ep || !ep.handlers || !ep.handlers.length)
         return crudApis.middleware(req,res,next); // try default crud apis
 
-      ep.handler(req,res,next);
+      ep.handlers.pop()(req,res,next);
       
     };
   }
