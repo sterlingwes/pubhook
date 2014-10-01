@@ -12,10 +12,12 @@ describe('server-api-defined', function() {
   it('should get defined apis', function(done) {
     
     userApis.get().then(function(apis) {
+      console.log(JSON.stringify(apis));
+      return done();
       
       // hello GET: /world
       // api hash, apiName, method, resource
-      testEp(apis,'hello','get','/world');
+      testEp(apis.endpoints,'hello','get','/world');
       
       done();
     }).catch(function(err) { console.error(err.stack); });

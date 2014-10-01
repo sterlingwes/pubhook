@@ -3,6 +3,7 @@ var glob = require('glob')
   , url = require('url')
   , cwd = process.cwd()
   , triggerBuild = require('./tasks-trigger')
+  , fetch = require('./models-fetcher').fetcher
 
   , models
 ;
@@ -63,7 +64,7 @@ var middleware = function(req,res,next) {
   
   var path = getPath(req)
     , resource = models[path.resource];
-
+  
   if(!resource)
     return next(); // hand off to other handlers (default deny request)
 
@@ -99,6 +100,13 @@ var middleware = function(req,res,next) {
       });
     }
   }
+  else if(resource) {
+    fetch(path.resource, resource, function(err, m) {
+      res.toJson(err, m ? m.items : undefined);
+    });
+  }
+  else
+    next();
 };
 
 module.exports = {
@@ -108,34 +116,5 @@ module.exports = {
   getPath: getPath,
   
   getModels: getModels
-  
-  // TODO: needs to use an array of promises to resolve issue in } else {}
-  // this block is currently UNUSED
-  /*
-  getEndpoints: function(done, models) {
-    if(!models)
-      models = getModels();
-    
-    var resources = {};
-    _.each(models, function(m,k) {
-      var name = k.split('.').pop()
-        , actions = resources[name] = [];
-      
-      if(m && typeof m.resourceHandlers === 'object')
-        [].push.apply(actions, Object.keys(m.resourceHandlers));
-      else {
-        var db;
-        try { db = require('./db-'+resource.pubhookType); }
-        catch(e) {}
-        if(db)
-          db.resourceHandlers(resource).then(function(actions) {
-            [].push.apply(actions, Object.keys(actions));
-          });
-      }
-    });
-    
-    done(resources);
-  }
-  */
   
 };

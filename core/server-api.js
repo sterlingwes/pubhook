@@ -43,7 +43,7 @@ module.exports = {
       path.push('/'+parts.join('/')); // resource & any ids or other parts
       path.push.apply(path, [req.method.toLowerCase(), 'handlers']); // method and handler
       
-      var level = apis[path.shift()]
+      var level = apis ? apis[path.shift()] : undefined
         , ep;
       
       _.find(path, function(part) {

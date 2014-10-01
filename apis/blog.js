@@ -62,4 +62,6 @@ module.exports = function(app) {
   //Serve the rss feed
   app.get('/rss', routes.rss.index);
   
+  return app;
+  
 };

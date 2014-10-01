@@ -24,9 +24,7 @@ var RouteHelper = function(apiName) {
 HTTPmethods.forEach(function(method) {
   RouteHelper.prototype[method] = function(resource) {
     
-    var handlers = [].slice.call(arguments,1).filter(function(fn) {
-      return typeof fn === 'function';
-    });
+    var handlers = [].slice.call(arguments,1);
     
     if(!resource || !handlers.length || typeof resource !== 'string')
       return console.warn('! Invalid signature for api RouteHelper.'+method+'(resource, handlerFn, ...) method call');
@@ -87,12 +85,14 @@ var getApis = function() {
         cleanName = cleanName.slice(0,cleanName.length-3);
 
         if(typeof exp === 'function') {
-          var helper = new RouteHelper(cleanName);
-          if(exp.length>1)
-            exp(helper, function() { yes([cleanName, helper.routes]) });
+          var helper = new RouteHelper(cleanName)
+            , ret;
+          if(exp.length>1) // function arrity, check for callback
+            exp(helper, function() { yes([cleanName, helper.routes, helper.middleware]) });
           else {
-            exp(helper);
-            yes([cleanName,helper.routes]);
+            ret = exp(helper);
+            console.log(JSON.stringify(ret||{}), JSON.stringify(helper.routes));
+            yes([cleanName, helper.routes, helper.middleware]);
           }
         }
 
@@ -102,17 +102,22 @@ var getApis = function() {
   
   return Promise.all(promises).then(function(routes) {
     // organize: apiName > resource > method > handler
-    var eps = {};
+    var eps = {}
+      , middleware = {};
     routes.forEach(function(pair) {
-      // pair is first apiName, then 'routes' from RouteHelper
+      // pair is first apiName, then 'routes' and 'middleware' from RouteHelper
       eps[pair[0]] = pair[1];
+      middleware[pair[0]] = pair[2];
     });
     fetchedEndpoints = eps;
     
     // write helper script
     require('./server-reflector')(eps,null,require('./tools/ajax')());
     
-    return eps;
+    return {
+      endpoints:  eps,
+      middleware: middleware
+    };
   });
 };
 
