@@ -12,6 +12,8 @@ module.exports = {
   jsonHandler: function(req,res,next) {
     res.toJson = function(err,data,statusCode) {
       
+      res.setHeader('Content-Type', 'application/json');
+      
       if(typeof data === 'string') {
         try {
           data = JSON.parse(data);
