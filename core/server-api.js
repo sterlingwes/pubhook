@@ -59,7 +59,7 @@ module.exports = {
       if(!ep || !ep.handlers || !ep.handlers.length)
         return crudApis.middleware(req,res,next); // try default crud apis
 
-      ep.handlers.pop()(req,res,next);
+      ep.handlers[0](req,res,next);
       
     };
   }
